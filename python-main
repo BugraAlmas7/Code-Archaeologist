@@ -1,0 +1,177 @@
+import os
+import re
+import sys
+import torch
+import subprocess
+import numpy as np
+from google.colab import drive
+from unsloth import FastLanguageModel
+from sentence_transformers import SentenceTransformer, util
+
+# ==============================================================================
+# 1. RAG SİSTEMİ KURULUMU (BİLGİ BANKASI)
+# ==============================================================================
+print("ULTIMATE KOD DOKTORU (RAM + RAG) BAŞLATILIYOR...")
+
+if not os.path.exists('/content/drive'):
+    drive.mount('/content/drive')
+
+# Embedding Modeli (Metinleri sayıya çeviren beyin)
+print("RAG Modeli Yükleniyor (all-MiniLM-L6-v2)...")
+embedder = SentenceTransformer('all-MiniLM-L6-v2')
+
+# SİMÜLASYON VERİSİ (Senin Agent.pdf İçeriği) [cite: 1-174]
+# Normalde burası PDF'ten okunur ama hızlı çalışması için chunk'ları buraya gömdüm.
+knowledge_base = [
+    "ReAct (Reasoning + Acting), Büyük Dil Modellerinin (LLM) problem çözen otonom ajanlara dönüşmesini sağlayan bir mimaridir.",
+    "ReAct döngüsü üç adımdan oluşur: Thought (Düşünce), Action (Eylem) ve Observation (Gözlem).",
+    "Klasik RAG sistemleri soruyu alır ve cevabı verir. ReAct mimarisinde ise sistem ham bilgiyi döndüren bir Tool olmalıdır.",
+    "Sonsuz Döngü (Infinite Loop) sorununu çözmek için 'max_turns' (döngü limiti) koyulmalıdır.",
+    "Ajanın elinde olmayan bir aracı uydurmasına 'Halüsinasyon' denir. System Prompt'ta araçlar net tanımlanmalıdır.",
+    "Yol A (RAG): Verilerinizi chunklara bölün, embeddinglerini çıkarın ve Vektör Veritabanına kaydedin.",
+    "Yol B (LoRa): Verilerinizle bir Base Modeli fine-tune ederek sektörel bilgiye sahip bir LoRa adaptörü eğitin.",
+    "ReAct Agentic RAG'da LLM bir 'Orkestratör/Karar Verici' rolündedir.",
+    "Python executor tool, ajanın yazdığı Python kodunu sanal ortamda çalıştırır ve sonucunu Observation olarak döner.",
+]
+
+# Verileri Vektöre Çevir (Embedding)
+print("Bilgi Bankası İndeksleniyor...")
+corpus_embeddings = embedder.encode(knowledge_base, convert_to_tensor=True)
+
+# ==============================================================================
+# 2. LOCAL MODEL (DEEP-100) YÜKLEME
+# ==============================================================================
+CHECKPOINT_PATH = "/content/drive/MyDrive/CodeGen_Project/models/deep_instruction/checkpoints/checkpoint-100"
+
+try:
+    if model: pass
+except:
+    print(f"\nAna Beyin Yükleniyor: {CHECKPOINT_PATH}")
+    model, tokenizer = FastLanguageModel.from_pretrained(
+        model_name=CHECKPOINT_PATH,
+        max_seq_length=2048,
+        dtype=None,
+        load_in_4bit=True,
+    )
+    FastLanguageModel.for_inference(model)
+
+# ==============================================================================
+# 3. ARAÇLAR (TOOLS) - ŞİMDİ RAG ARACI DA VAR!
+# ==============================================================================
+
+def python_executor_tool(code_snippet):
+    """Kodu çalıştırır."""
+    print(f"\n[ACTION] Kod Çalıştırılıyor...")
+    try:
+        code_snippet = code_snippet.replace("```python", "").replace("```", "").strip()
+        result = subprocess.run(
+            [sys.executable, "-c", code_snippet],
+            capture_output=True, text=True, timeout=5
+        )
+        if result.stderr:
+            return f"HATA: {result.stderr.strip()}"
+        return f"ÇIKTI: {result.stdout.strip()}" if result.stdout else "ÇIKTI: (Boş)"
+    except Exception as e:
+        return f"SİSTEM HATASI: {str(e)}"
+
+def rag_retrieval_tool(query):
+    """Bilgi Bankasında (Vektör DB) arama yapar."""
+    print(f"\n[ACTION] Bilgi Bankasında Aranıyor: '{query}'")
+
+    # Soruyu vektöre çevir
+    query_embedding = embedder.encode(query, convert_to_tensor=True)
+
+    # En yakın benzerliği bul (Cosine Similarity)
+    cos_scores = util.cos_sim(query_embedding, corpus_embeddings)[0]
+    top_results = torch.topk(cos_scores, k=2) # En iyi 2 sonucu getir
+
+    results = []
+    print(f"   Bulunan Dökümanlar:")
+    for score, idx in zip(top_results[0], top_results[1]):
+        doc = knowledge_base[idx]
+        print(f"   - (Skor: {score:.4f}) {doc}")
+        results.append(doc)
+
+    return "\n".join(results)
+
+# ==============================================================================
+# 5. GÜNCELLENMİŞ ANA DÖNGÜ (SMART REGEX - FORMAT TAKINTISI YOK)
+# ==============================================================================
+def ultimate_agent_session():
+    print("\n" + "="*70)
+    print("ULTIMATE AJAN V2 (Akıllı Kod Algılama)")
+    print("="*70)
+
+    system_prompt = """Sen 'Kod Doktoru'sun.
+    MEVCUT ARAÇLARIN:
+    1. [python_executor]: Kod yazıp çalıştırmak için.
+    2. [rag_retrieval]: Bilgi aramak için.
+
+    KURALLAR:
+    - Kod yazarken "sys", "argv", "input" kullanma.
+    - Hafızanı kullan.
+    """
+
+    chat_history = [{"role": "system", "content": system_prompt}]
+
+    while True:
+        user_input = input("\nASK/CODE:\n>> ")
+        if user_input.lower() in ['exit', 'q', 'çık']:
+            print("Görüşürüz!")
+            break
+
+        print("\nAjan düşünüyor...")
+        chat_history.append({"role": "user", "content": user_input})
+
+        if len(chat_history) > 10: chat_history = [chat_history[0]] + chat_history[-6:]
+
+        # --- DÜŞÜNME ---
+        text_input = tokenizer.apply_chat_template(chat_history, tokenize=False, add_generation_prompt=True)
+        inputs = tokenizer([text_input], return_tensors="pt").to("cuda")
+
+        outputs = model.generate(
+            **inputs,
+            max_new_tokens=1024,
+            stop_strings=["User:"],
+            tokenizer=tokenizer,
+            temperature=0.1,
+            do_sample=True
+        )
+
+        full_response = tokenizer.batch_decode(outputs[:, inputs.input_ids.shape[1]:], skip_special_tokens=True)[0]
+        response = full_response.strip()
+
+        print(f"\nTHOUGHT:\n{response}")
+        chat_history.append({"role": "assistant", "content": response})
+
+        # --- EYLEM (AKILLI REGEX BURADA!) ---
+
+        # 1. RAG Kontrolü
+        if "rag_retrieval" in response:
+            obs = rag_retrieval_tool(user_input)
+            chat_history.append({"role": "user", "content": f"Observation: {obs}"})
+            print(f"👀 RAG SONUCU: Bilgi bulundu.")
+
+        # 2. Kod Kontrolü (GÜNCELLENDİ)
+        elif "python_executor" in response or "def " in response or "print(" in response:
+
+            # Önce Markdown kutucuğu ara
+            code_match = re.search(r"```python(.*?)```", response, re.DOTALL)
+
+            if code_match:
+                code_to_run = code_match.group(1).strip()
+            else:
+                # Markdown YOKSA ama içinde kod varsa (Fallback Mekanizması)
+                # Basitçe tüm yanıtı kod olarak al (ama gereksiz metinleri temizle)
+                print("Uyarı: Markdown bulunamadı, düz metin kod olarak deneniyor...")
+                code_to_run = response.replace("python_executor", "").strip()
+
+            if "sys.argv" in code_to_run or "input(" in code_to_run:
+                 print("Kod güvenli değil (sys/input), çalıştırılmadı.")
+            else:
+                obs = python_executor_tool(code_to_run)
+                print(f"{obs}")
+                chat_history.append({"role": "user", "content": f"Observation: {obs}"})
+
+# Çalıştır
+ultimate_agent_session()
