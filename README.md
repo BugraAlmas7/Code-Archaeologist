@@ -1,5 +1,5 @@
 # Code-Archaeologist
-# 🩺 Code Doctor: Autonomous ReAct Agent with RAG & Memory
+# Code Archaeologist: Autonomous ReAct Agent with RAG & Memory
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
 ![Model](https://img.shields.io/badge/Model-Deep--100%20(Unsloth)-orange)
@@ -8,7 +8,7 @@
 
 **Code-Archaeologist** is an advanced autonomous agent capable of writing, executing, and fixing Python code. Built upon a fine-tuned **Deep-100 (DeepSeek/Qwen2.5)** model, it utilizes the **ReAct (Reasoning + Acting)** architecture to solve complex problems by orchestrating tools, maintaining memory context, and retrieving domain knowledge via RAG.
 
-## 🌟 Key Features
+##  Key Features
 
 * **🧠 ReAct Architecture:** Implements the *Thought → Action → Observation* loop to reason through problems.
 * **🛠️ Tool Use & Execution:** Writes Python code and executes it in a controlled sandbox environment using `subprocess`.
