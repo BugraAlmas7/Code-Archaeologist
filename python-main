@@ -99,10 +99,10 @@ def rag_retrieval_tool(query):
 # ==============================================================================
 def ultimate_agent_session():
     print("\n" + "="*70)
-    print("ULTIMATE AJAN V2 (Akıllı Kod Algılama)")
+    print("ULTIMATE CODE ARCHAEOLOGIST")
     print("="*70)
 
-    system_prompt = """Sen 'Kod Doktoru'sun.
+    system_prompt = """Sen 'Kod Arkeologu'sun.
     MEVCUT ARAÇLARIN:
     1. [python_executor]: Kod yazıp çalıştırmak için.
     2. [rag_retrieval]: Bilgi aramak için.
@@ -150,7 +150,7 @@ def ultimate_agent_session():
         if "rag_retrieval" in response:
             obs = rag_retrieval_tool(user_input)
             chat_history.append({"role": "user", "content": f"Observation: {obs}"})
-            print(f"👀 RAG SONUCU: Bilgi bulundu.")
+            print(f" RAG SONUCU: Bilgi bulundu.")
 
         # 2. Kod Kontrolü (GÜNCELLENDİ)
         elif "python_executor" in response or "def " in response or "print(" in response:
