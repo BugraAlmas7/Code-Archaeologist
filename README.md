@@ -10,16 +10,16 @@
 
 ##  Key Features
 
-* **🧠 ReAct Architecture:** Implements the *Thought → Action → Observation* loop to reason through problems.
-* **🛠️ Tool Use & Execution:** Writes Python code and executes it in a controlled sandbox environment using `subprocess`.
-* **📚 RAG (Retrieval-Augmented Generation):** Consults a knowledge base (Vector DB using `sentence-transformers`) for theoretical questions.
-* **💾 Dynamic Memory:** Maintains conversation history (Context Awareness) to handle follow-up questions.
-* **🛡️ Self-Correction & Safety:**
+* ** ReAct Architecture:** Implements the *Thought → Action → Observation* loop to reason through problems.
+* ** Tool Use & Execution:** Writes Python code and executes it in a controlled sandbox environment using `subprocess`.
+* ** RAG (Retrieval-Augmented Generation):** Consults a knowledge base (Vector DB using `sentence-transformers`) for theoretical questions.
+* ** Dynamic Memory:** Maintains conversation history (Context Awareness) to handle follow-up questions.
+* ** Self-Correction & Safety:**
     * Detects and fixes execution errors (e.g., `NameError`, `SyntaxError`).
     * Enforces safety constraints (blocks `sys`, `input`, and infinite loops via timeouts).
     * "Smart Regex" parsing to handle unstructured model outputs.
 
-## 🏗️ Architecture
+##  Architecture
 
 1.  **Orchestrator:** The Deep-100 LLM generates thoughts and decides which tool to use.
 2.  **Tools:**
@@ -27,7 +27,7 @@
     * `rag_retrieval`: Searches semantic embeddings of documentation.
 3.  **Safety Layer:** Filters malicious imports and enforces execution timeouts.
 
-## 🚀 Installation & Usage
+##  Installation & Usage
 
 This project is optimized for Google Colab (using T4 GPU) due to `unsloth` dependencies.
 
