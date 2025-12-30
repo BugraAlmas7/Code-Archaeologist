@@ -1,0 +1,84 @@
+import os
+import json
+import matplotlib.pyplot as plt
+from google.colab import drive
+
+# 1. Drive Bağla
+if not os.path.exists('/content/drive'):
+    drive.mount('/content/drive')
+
+#  DEEP MODELİNİN YOLU (Senin projedeki yol)
+BASE_DIR = "/content/drive/MyDrive/CodeGen_Project/models/deep_instruction/checkpoints"
+
+print(f" Klasör taranıyor: {BASE_DIR}")
+
+# 2. En son checkpoint'i bul (En çok bilgi oradadır)
+try:
+    checkpoints = [d for d in os.listdir(BASE_DIR) if "checkpoint" in d]
+    # Numaraya göre sırala (en büyük numara en sondur)
+    checkpoints.sort(key=lambda x: int(x.split('-')[-1]))
+
+    latest_checkpoint = checkpoints[-1]
+    json_path = os.path.join(BASE_DIR, latest_checkpoint, "trainer_state.json")
+
+    print(f" Bulunan En Son Kayıt: {latest_checkpoint}")
+    print(f" Okunan Dosya: {json_path}")
+
+except Exception as e:
+    print(" HATA: Checkpoint klasörü bulunamadı veya boş.")
+    print(f"Yol: {BASE_DIR}")
+    raise SystemExit("Dosya yok.")
+
+# 3. JSON Dosyasını Oku ve Verileri Çek
+with open(json_path, 'r') as f:
+    data = json.load(f)
+
+log_history = data['log_history']
+
+train_steps = []
+train_losses = []
+eval_steps = []
+eval_losses = []
+
+print("\n" + "="*50)
+print(f"📊 KURTARILAN EĞİTİM TABLOSU (DEEP)")
+print("="*50)
+print(f"{'Adım':<10} | {'Train Loss':<15} | {'Validation Loss':<20}")
+print("-" * 50)
+
+# Verileri ayrıştır ve tablo yap
+for entry in log_history:
+    if 'loss' in entry: # Train verisi
+        step = entry['step']
+        loss = entry['loss']
+        train_steps.append(step)
+        train_losses.append(loss)
+        print(f"{step:<10} | {loss:<15.4f} | {'-':<20}")
+
+    elif 'eval_loss' in entry: # Validation verisi
+        step = entry['step']
+        loss = entry['eval_loss']
+        eval_steps.append(step)
+        eval_losses.append(loss)
+        # Tabloda eval satırı genelde ayrı basılır
+        print(f"{step:<10} | {'-':<15} | {loss:<20.4f}")
+
+# 4. BONUS: PDF İÇİN GRAFİK ÇİZ (Bunu Raporuna Koyarsın!)
+print("\n Grafik çiziliyor...")
+
+plt.figure(figsize=(10, 6))
+plt.plot(train_steps, train_losses, label='Training Loss', color='blue', marker='o', markersize=3)
+if eval_steps:
+    plt.plot(eval_steps, eval_losses, label='Validation Loss', color='red', linewidth=2, marker='x')
+
+plt.title('DEEP Model - Eğitim ve Doğrulama Hatası (Loss)')
+plt.xlabel('Adım (Steps)')
+plt.ylabel('Loss')
+plt.legend()
+plt.grid(True, linestyle='--', alpha=0.7)
+
+# Grafiği kaydet
+graph_path = "/content/deep_loss_graph.png"
+plt.savefig(graph_path)
+print(f" Grafik kaydedildi: {graph_path} (Bunu indirip rapora koy!)")
+plt.show()
