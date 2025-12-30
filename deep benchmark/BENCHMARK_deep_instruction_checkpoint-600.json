@@ -1,0 +1,382 @@
+[
+  {
+    "id": "abc301_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    n = int(input().strip())\n    s = input().strip()\n    \n    takahashi_wins = s.count('T')\n    aoki_wins = s.count('A')\n    \n    if takahashi_wins > aoki_wins:\n        print('T')\n    elif aoki_wins > takahashi_wins:\n        print('A')\n    else:\n        if n % 2 == 1:\n            print('T')\n        else:\n            print('A')\n\nif __name__ == '__main__':\n    main()"
+  },
+  {
+    "id": "abc301_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    import sys\n    data = sys.stdin.read().split()\n    n = int(data[0])\n    arr = list(map(int, data[1:1+n]))\n    \n    result = []\n    current = arr[:]\n    \n    while True:\n        found = False\n        for i in range(n - 1):\n            if abs(current[i] - current[i + 1]) == 1:\n                continue\n            \n            # Find closest neighbors with same sign\n            left = None\n            right = None\n            \n            # Check left neighbor\n            if current[i] > 0:\n                left = max(1, current[i] - 1)\n            else:\n                left = min(100, current[i] + 1)\n            \n            # Check right neighbor\n            if current[i + 1] > 0:\n                right = max(1, current[i + 1] - 1)\n            else:\n                right = min(100, current[i + 1] + 1)\n            \n            # Try inserting all possible values between left and right\n            for val in range(left, right + 1):\n                if abs(val - current[i]) == 1 or abs(val - current[i + 1]) == 1:\n                    continue\n                \n                new_list = current[:i + 1]\n                new_list.extend([val] * len(range(left, right + 1)))\n                new_list.extend(current[i + 1:])\n                \n                # Check if we can finish early\n                if all(abs(new_list[j] - new_list[j + 1]) == 1 for j in range(len(new_list) - 1)):\n                    result = new_list\n                    found = True\n                    break\n                    \n            if found:\n                break\n        \n        if not found:\n            break\n    \n    print(' '.join(map(str, result)))\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc302_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    data = sys.stdin.read().split()\n    A = int(data[0])\n    B = int(data[1])\n    \n    if B == 0:\n        print(0)\n        return\n        \n    low = 1\n    high = 10**18\n    \n    while low <= high:\n        mid = (low + high) // 2\n        if A * mid >= B * (mid - 1):\n            low = mid + 1\n        else:\n            high = mid - 1\n            \n    print(high)\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc303_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    data = sys.stdin.read().split()\n    n = int(data[0])\n    m = int(data[1])\n    \n    grid = []\n    index = 2\n    for i in range(m):\n        row = list(map(int, data[index:index+n]))\n        index += n\n        grid.append(row)\n    \n    count = 0\n    for i in range(m):\n        for j in range(n):\n            if j < n - 1:\n                if grid[i][j] == grid[i][j+1]:\n                    count += 1\n            if i < m - 1:\n                if grid[i][j] == grid[i+1][j]:\n                    count += 1\n                    \n    print(count)\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc303_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    n = int(input().strip())\n    S = input().strip()\n    T = input().strip()\n    \n    for i in range(n):\n        s_char = S[i]\n        t_char = T[i]\n        \n        # Check if both characters are same\n        if s_char != t_char:\n            # Check if they're opposite case or digit/letter pair\n            if (s_char == '1' and t_char == 'o') or (s_char == '0' and t_char == 'l'):\n                continue\n                \n            # If neither, they're not similar\n            print(\"No\")\n            return\n        \n    print(\"Yes\")\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc304_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    data = sys.stdin.read().splitlines()\n    n = int(data[0])\n    \n    people = []\n    for i in range(1, 1 + n):\n        parts = data[i].split()\n        name = parts[0]\n        age = int(parts[1])\n        people.append((name, age))\n    \n    # Create dictionary mapping age to list of (name, index)\n    age_to_people = {}\n    for idx, (name, age) in enumerate(people):\n        if age not in age_to_people:\n            age_to_people[age] = []\n        age_to_people[age].append((name, idx))\n    \n    # Sort by age in ascending order\n    sorted_ages = sorted(age_to_people.keys())\n    \n    result = []\n    for age in sorted_ages:\n        people_list = age_to_people[age]\n        # Rotate the list by age difference\n        rotation = age - people_list[0][1]\n        rotated = people_list[-rotation:] + people_list[:-rotation]\n        for name, _ in rotated:\n            result.append(name)\n    \n    print(\"\\n\".join(result))\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc304_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    N = int(input().strip())\n    \n    if N <= 10**3 - 1:\n        print(N)\n        return\n        \n    # Calculate number of digits needed for each level\n    levels = [10**3, 10**4, 10**5, 10**6, 10**7, 10**8]\n    num_digits = len(levels)\n    \n    # For numbers with at most 10^9 digits, we need up to 10 digits\n    max_digits = 10\n    \n    # Find which level this number belongs to\n    level_index = 0\n    while level_index < num_digits - 1 and N >= levels[level_index]:\n        level_index += 1\n    \n    # Get the base value for this level\n    base_val = levels[level_index]\n    \n    # Calculate the mask for this level\n    mask = base_val - 1\n    \n    # Apply the appropriate truncation\n    if level_index == 0:  # level 1: 10^3-1\n        pass\n    elif level_index == 1:  # level 2: 10^4-1\n        truncated = N // 10\n    elif level_index == 2:  # level 3: 10^5-1\n        truncated = N // 100\n    elif level_index == 3:  # level 4: 10^6-1\n        truncated = N // 1000\n    elif level_index == 4:  # level 5: 10^7-1\n        truncated = N // 10000\n    elif level_index == 5:  # level 6: 10^8-1\n        truncated = N // 100000\n    else:  # level 6: 10^9-1\n        truncated = N // 1000000\n    \n    # Apply the truncation based on the level\n    if level_index == 1:  # level 2: 10^4-1\n        truncated %= 1000\n    elif level_index == 2:  # level 3: 10^5-1\n        truncated %= 10000\n    elif level_index == 3"
+  },
+  {
+    "id": "abc305_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    N = int(input().strip())\n    if N <= 5:\n        print(5)\n    elif N <= 10:\n        print(10)\n    elif N <= 15:\n        print(15)\n    elif N <= 20:\n        print(20)\n    elif N <= 25:\n        print(25)\n    elif N <= 30:\n        print(30)\n    elif N <= 35:\n        print(35)\n    elif N <= 40:\n        print(40)\n    elif N <= 45:\n        print(45)\n    else:\n        print(50)\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc305_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "p, q = input().split()\nif p == 'A':\n    if q == 'B':\n        print(6)\n    elif q == 'C':\n        print(4)\nelif p == 'B':\n    if q == 'A':\n        print(6)\n    elif q == 'C':\n        print(4)\nelif p == 'C':\n    if q == 'A':\n        print(4)\n    elif q == 'B':\n        print(4)\nelif p == 'D':\n    if q == 'A':\n        print(5)\n    elif q == 'B':\n        print(5)\n    elif q == 'C':\n        print(9)\n    elif q == 'E':\n        print(1)\nelif p == 'E':\n    if q == 'A':\n        print(1)\n    elif q == 'B':\n        print(1)\n    elif q == 'C':\n        print(9)\n    elif q == 'D':\n        print(1)\nelif p == 'F':\n    if q == 'A':\n        print(5)\n    elif q == 'B':\n        print(5)\n    elif q == 'C':\n        print(1)\n    elif q == 'D':\n        print(5)\n    elif q == 'E':\n        print(9)\n    elif q == 'F':\n        print(9)\n    elif q == 'G':\n        print(20)\nelse:  # p == 'G'\n    if q == 'A':\n        print(9)\n    elif q == 'B':\n        print(9)\n    elif q == 'C':\n        print(1)\n    elif q == 'D':\n        print(5)\n    elif q == 'E':\n        print(9)\n    elif q == 'F':\n        print(20)"
+  },
+  {
+    "id": "abc306_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    import sys\n    data = sys.stdin.read().splitlines()\n    n = int(data[0])\n    s = data[1].strip()\n    \n    result = s + s[:len(s)-1]\n    print(result)\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc306_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    digits = list(map(int, input().split()))\n    result = 0\n    for i in range(64):\n        power = (63 - i) * 2\n        if digits[i] == 1:\n            result += (1 << power)\n    print(result)\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc307_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    import sys\n    data = sys.stdin.read().split()\n    n = int(data[0])\n    steps = list(map(int, data[1:1+n]))\n    \n    total_per_week = []\n    current_sum = 0\n    for step in steps:\n        current_sum += step\n        if len(total_per_week) < n:\n            total_per_week.append(current_sum)\n    \n    print(\" \".join(map(str, total_per_week)))\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc307_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    data = sys.stdin.read().splitlines()\n    n = int(data[0])\n    strings = data[1:1+n]\n    \n    max_len = 50\n    results = [False] * n\n    \n    for i in range(n):\n        s = strings[i]\n        m = len(s)\n        \n        # Check all possible starting positions\n        for start in range(m + 1):\n            # Check all possible lengths up to max_len\n            for length in range(1, min(max_len, m - start) + 1):\n                end = start + length\n                if end > m:\n                    break\n                    \n                # Check if substring is palindromic\n                left, right = start, end - 1\n                while left < right:\n                    if s[left] != s[right]:\n                        results[i] = True\n                        break\n                    left += 1\n                    right -= 1\n                else:\n                    continue\n                \n                # If found, check if any other string has same prefix\n                for j in range(n):\n                    if i == j:\n                        continue\n                    if strings[j].startswith(s[start:end]):\n                        results[i] = True\n                        break\n                if results[i]:\n                    break\n        \n    output_lines = []\n    for res in results:\n        output_lines.append(\"Yes\" if res else \"No\")\n    \n    print(\"\\n\".join(output_lines))\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc308_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    data = sys.stdin.read().split()\n    numbers = list(map(int, data))\n    \n    # Check if all numbers are multiples of 25\n    if not all(num % 25 == 0 for num in numbers):\n        print(\"No\")\n        return\n        \n    # Check if sorted in non-decreasing order\n    sorted_numbers = sorted(numbers)\n    if sorted_numbers != numbers:\n        print(\"No\")\n        return\n        \n    # Check if all numbers are between 100 and 675\n    if not all(100 <= num <= 675 for num in numbers):\n        print(\"No\")\n        return\n        \n    print(\"Yes\")\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc308_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    import sys\n    data = sys.stdin.read().splitlines()\n    \n    n, m = map(int, data[0].split())\n    colors = data[1].split()\n    pairs = []\n    for i in range(2, 2 + m):\n        pairs.append((data[i].strip(), int(data[i + 1])))\n    \n    # Create mapping: color -> [pair_index]\n    color_to_pairs = {}\n    for idx, (color, _) in enumerate(pairs):\n        if color not in color_to_pairs:\n            color_to_pairs[color] = []\n        color_to_pairs[color].append(idx)\n    \n    total_price = 0\n    for i in range(n):\n        c = colors[i]\n        if c in color_to_pairs:\n            for pair_idx in color_to_pairs[c]:\n                _, p = pairs[pair_idx]\n                total_price += p\n    \n    print(total_price)\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc309_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    A, B = map(int, input().split())\n    row_A = (A - 1) // 3\n    col_A = (A - 1) % 3\n    row_B = (B - 1) // 3\n    col_B = (B - 1) % 3\n    \n    horizontal_adjacent = (col_A == col_B)\n    \n    if horizontal_adjacent:\n        print(\"Yes\")\n    else:\n        print(\"No\")\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc309_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    import sys\n    data = sys.stdin.read().splitlines()\n    if not data:\n        return\n    \n    N = int(data[0])\n    grid = []\n    for i in range(1, 1 + N):\n        grid.append(list(map(int, data[i].strip())))\n    \n    # Create original grid as reference\n    result_grid = []\n    for i in range(N):\n        row = []\n        for j in range(N):\n            row.append(grid[i][j])\n        result_grid.append(row)\n    \n    # Shift rightward\n    for i in range(N):\n        for j in range(N - 1, -1, -1):\n            if j == N - 1:\n                result_grid[i][j] = grid[i][0]\n            else:\n                result_grid[i][j] = grid[i][j + 1]\n    \n    # Shift upward\n    for i in range(N):\n        for j in range(N):\n            if i == 0:\n                result_grid[i][j] = grid[N - 1][j]\n            else:\n                result_grid[i][j] = grid[i - 1][j]\n    \n    # Shift leftward\n    for i in range(N):\n        for j in range(N):\n            if j == 0:\n                result_grid[i][j] = grid[i][N - 1]\n            else:\n                result_grid[i][j] = grid[i][j - 1]\n    \n    # Shift downward\n    for i in range(N):\n        for j in range(N):\n            if i == N - 1:\n                result_grid[i][j] = grid[0][j]\n            else:\n                result_grid[i][j] = grid[i + 1][j]\n    \n    # Output the result\n    for row in result_grid:\n        print(''.join(map(str, row)))\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc310_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    import sys\n    data = sys.stdin.read().split()\n    \n    N = int(data[0])\n    P = int(data[1])\n    Q = int(data[2])\n    D = list(map(int, data[3:3+N]))\n    \n    min_cost = float('inf')\n    \n    # Option 1: Use coupon (dish costs Q)\n    cost_option1 = Q + P\n    \n    # Option 2: Don't use coupon, but choose cheapest dish\n    min_cost_dish = min(D)\n    cost_option2 = min_cost_dish + P\n    \n    # Option 3: Don't use coupon, but choose most expensive dish\n    max_cost_dish = max(D)\n    cost_option3 = max_cost_dish + P\n    \n    # Find the minimum among all options\n    min_cost = min(cost_option1, cost_option2, cost_option3)\n    \n    print(min_cost)\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc310_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    data = sys.stdin.read().split()\n    if not data:\n        return\n    \n    n = int(data[0])\n    m = int(data[1])\n    \n    products = []\n    index = 2\n    for i in range(n):\n        p_val = int(data[index]); index += 1\n        c_val = int(data[index]); index += 1\n        \n        functions = list(map(int, data[index:index+c_val]))\n        index += c_val\n        \n        products.append((p_val, sorted(functions)))\n    \n    found = False\n    for i in range(n):\n        for j in range(n):\n            if i == j:\n                continue\n                \n            # Check price condition: P_i >= P_j\n            if products[i][0] < products[j][0]:\n                continue\n                \n            # Check function inclusion: all(F_j) \u2286 all(F_i)\n            i_functions = set(products[i][1])\n            j_functions = set(products[j][1])\n            \n            if i_functions - j_functions != set():\n                continue\n                \n            # Check price condition again: P_i > P_j\n            if products[i][0] <= products[j][0]:\n                continue\n                \n            found = True\n            break\n            \n        if found:\n            print(\"Yes\")\n            break\n            \n    if not found:\n        print(\"No\")\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc311_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    import sys\n    data = sys.stdin.read().splitlines()\n    n = int(data[0])\n    s = data[1].strip()\n    \n    count_A = 0\n    count_B = 0\n    count_C = 0\n    \n    total_checked = 0\n    \n    for char in s:\n        if char == 'A':\n            count_A += 1\n        elif char == 'B':\n            count_B += 1\n        else:  # char == 'C'\n            count_C += 1\n        \n        if count_A > 0 and count_B > 0 and count_C > 0:\n            total_checked += 1\n            \n    print(total_checked)\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc311_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    import sys\n    data = sys.stdin.read().splitlines()\n    \n    n, d = map(int, data[0].split())\n    schedules = []\n    for i in range(1, 1 + n):\n        schedules.append(data[i])\n    \n    max_count = 0\n    \n    for start in range(n):\n        count = 0\n        for end in range(start, start + d):\n            if end < n and schedules[start][end] == 'o':\n                count += 1\n        if count > max_count:\n            max_count = count\n            \n    print(max_count)\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc312_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    S = sys.stdin.readline().strip()\n    \n    # Check each pattern\n    patterns = [\"ACE\", \"BDF\", \"CEG\", \"DFA\", \"EGB\", \"FAC\", \"GBD\"]\n    for pattern in patterns:\n        if S == pattern:\n            print(\"Yes\")\n            return\n    \n    print(\"No\")\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc312_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    data = sys.stdin.read().splitlines()\n    n, m = map(int, data[0].split())\n    grid = [line.strip() for line in data[1:1+n]]\n    \n    def is_valid_region(i, j):\n        # Check top-left 3x3\n        if not (grid[i][j] == '#' and \n               grid[i+1][j] == '#' and \n               grid[i+2][j] == '#' and \n               grid[i][j+1] == '#' and \n               grid[i+1][j+1] == '#' and \n               grid[i+2][j+1] == '#' and \n               grid[i][j+2] == '.' and \n               grid[i+1][j+2] == '.' and \n               grid[i+2][j+2] == '.'):\n            return False\n        \n        # Check bottom-right 3x3\n        if not (grid[i][j+3] == '#' and \n               grid[i+1][j+3] == '#' and \n               grid[i+2][j+3] == '#' and \n               grid[i][j+4] == '#' and \n               grid[i+1][j+4] == '#' and \n               grid[i+2][j+4] == '#' and \n               grid[i][j+5] == '.' and \n               grid[i+1][j+5] == '.' and \n               grid[i+2][j+5] == '.'):\n            return False\n        \n        # Check all cells in the region\n        for x in range(3):\n            for y in range(3):\n                if grid[i+x][j+y] != '#':\n                    return False\n        return True\n    \n    result = []\n    # Try all possible starting positions\n    for i in range(n - 6):  # Top-left corner must be in first 13 rows\n        for j in range(m - 6):  # Top-left corner must be in first 13 columns\n            if is_valid_region(i, j):\n                result.append(f\"{i} {j}\")\n                \n    # Sort lexicographically\n    result.sort(key=lambda x: (int(x.split()[0]), int(x.split()[1])))\n    \n    # Output results\n    print(len(result))\n    for pos in result:\n        print(pos)\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc313_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    data = sys.stdin.read().split()\n    n = int(data[0])\n    programming_abilities = list(map(int, data[1:1+n]))\n    \n    min_needed = float('inf')\n    for p in programming_abilities:\n        if p < min_needed:\n            min_needed = p\n    \n    print(max(0, min_needed - 1))\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc314_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    n = int(sys.stdin.readline().strip())\n    \n    # Precomputed digits for pi up to 100th decimal place\n    digits = \"31415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679\"\n    \n    # Extract digits up to N+1 (since indexing starts at 0)\n    result_digits = digits[:n + 1]\n    \n    # Remove trailing zeros\n    while len(result_digits) > 0 and result_digits[-1] == '0':\n        result_digits = result_digits[:-1]\n    \n    print(f\"{result_digits}\")\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc314_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    data = sys.stdin.read().split()\n    if not data:\n        return\n    \n    n = int(data[0])\n    X = int(data[n])\n    \n    # Precompute prefix sums for each position\n    prefix = [0] * (n + 1)\n    for i in range(1, n + 1):\n        prefix[i] = prefix[i - 1] + int(data[n + i])\n    \n    # Count how many positions have at least one bet\n    total_bets = 0\n    for i in range(n):\n        if prefix[i + 1] > 0:\n            total_bets += 1\n    \n    # Find all A lists where the sum equals X\n    result = []\n    for i in range(n):\n        if prefix[i + 1] == X:\n            result.append(i + 1)  # 1-based indexing\n    \n    # Sort the result list\n    result.sort()\n    \n    # Output the results\n    print(total_bets)\n    print(' '.join(map(str, result)))\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc315_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    data = sys.stdin.read().split()\n    if not data:\n        return\n    \n    M = int(data[0])\n    D_list = list(map(int, data[1:1+M]))\n    \n    total_days = sum(D_list)\n    half = (total_days + 1) // 2\n    \n    current_day = 0\n    for month_idx in range(M):\n        current_day += D_list[month_idx]\n        if current_day >= half:\n            # Find the exact position within the month\n            start_day = half - current_day + 1\n            # Find the month index where this day would be\n            a = month_idx + 1\n            # Find the day within the month\n            b = start_day\n            print(f\"{a} {b}\")\n            return\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc315_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "S = input().strip()\nresult = ''.join(c for c in S if c not in 'aeiou')\nprint(result)"
+  },
+  {
+    "id": "abc318_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    data = sys.stdin.read().split()\n    n = int(data[0])\n    \n    top_left_x = [int(data[i]) for i in range(1, 1 + n)]\n    top_left_y = [int(data[i]) for i in range(1 + n, 1 + 2 * n)]\n    bottom_right_x = [int(data[i]) for i in range(1 + 2 * n, 1 + 3 * n)]\n    bottom_right_y = [int(data[i]) for i in range(1 + 3 * n, 1 + 4 * n)]\n    \n    # Collect all intervals for both axes\n    x_intervals = []\n    y_intervals = []\n    \n    for i in range(n):\n        # Add left vertical interval (x = top_left_x)\n        x_intervals.append((top_left_x[i], top_left_y[i]))\n        \n        # Add right vertical interval (x = bottom_right_x)\n        x_intervals.append((bottom_right_x[i], bottom_right_y[i]))\n        \n        # Add bottom horizontal interval (y = top_left_y)\n        y_intervals.append((top_left_y[i], bottom_right_y[i]))\n        \n        # Add top horizontal interval (y = bottom_right_y)\n        y_intervals.append((bottom_right_y[i], top_left_y[i]))\n    \n    # Sort all intervals\n    x_intervals.sort(key=lambda x: (x[0], -x[1]))\n    y_intervals.sort(key=lambda y: (y[0], -y[1]))\n    \n    # Merge overlapping intervals\n    merged_x = []\n    current_start, current_end = None, None\n    \n    for interval in x_intervals:\n        if not merged_x or interval[0] > current_end:\n            if current_start is not None:\n                merged_x.append((current_start, current_end))\n            current_start, current_end = interval\n        else:\n            current_end = max(current_end, interval[1])\n    \n    merged_y = []\n    current_start, current_end = None, None\n    \n    for interval in y_intervals:\n        if not merged_y or interval[0] > current_end:\n            if current_start is not None:\n                merged_y.append((current_start, current_end))\n            current_start, current_end = interval\n        else:\n            current_end = max(current_end, interval[1])\n    \n    # Calculate total coverage\n    total_area = 0\n    for start_x, end_x in merged_x:\n"
+  },
+  {
+    "id": "abc318_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    N, M, P = map(int, input().split())\n    \n    if M >= P:\n        count = (N - 1) // P + 1\n        return count\n    \n    d = math.gcd(M, P)\n    m = M // d\n    p = P // d\n    q = d * (m + 1)\n    \n    if q == 0:\n        return 0\n    elif q > N:\n        return 0\n    else:\n        k = (N - q + 1) // p\n        return k * m\n\nif __name__ == \"__main__\":\n    print(main())"
+  },
+  {
+    "id": "abc319_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    N = int(input().strip())\n    \n    result = []\n    max_divisor = min(9, N + 1)\n    \n    for i in range(N + 1):\n        found = False\n        for d in range(1, max_divisor + 1):\n            if N % d == 0 and i % (N // d) == 0:\n                result.append(str(d))\n                found = True\n                break\n                \n        if not found:\n            result.append('-')\n            \n    print(''.join(result))\n\nif __name__ == '__main__':\n    main()"
+  },
+  {
+    "id": "abc320_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    s = input().strip()\n    n = len(s)\n    \n    # Precompute prefix palindromes: p[i][j] = true if s[i:j+1] is palindrome\n    p = [[False] * n for _ in range(n)]\n    \n    max_length = 0\n    \n    # All single characters are palindromes\n    for i in range(n):\n        p[i][i] = True\n        max_length = 1\n    \n    # Check substrings of length 2\n    for i in range(n - 1):\n        if s[i] == s[i + 1]:\n            p[i][i + 1] = True\n            max_length = 2\n    \n    # Check longer palindromes\n    for length in range(3, n + 1):\n        for i in range(n - length + 1):\n            j = i + length - 1\n            if s[i] == s[j] and p[i + 1][j - 1]:\n                p[i][j] = True\n                max_length = length\n    \n    print(max_length)\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc320_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    A, B = map(int, input().split())\n    result = pow(A, B) + pow(B, A)\n    print(result)\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc321_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    import sys\n    data = sys.stdin.read().split()\n    n = int(data[0])\n    x = int(data[1])\n    \n    scores = list(map(int, data[2:2+n-1]))\n    \n    scores.sort()\n    \n    total_sum = sum(scores)\n    if n == 2:\n        # Only one round, impossible to get >= 480\n        print(-1)\n        return\n    \n    if n == 3:\n        # Need at least 2nd quartile\n        threshold = 4 * total_sum // (n + 1)\n        if threshold <= x:\n            print(0)\n            return\n        \n        # Find the smallest k such that k*(k+1)/2 >= threshold\n        k = 1\n        while (k * (k + 1)) // 2 < threshold:\n            k += 1\n        min_score = scores[k - 1]\n        print(min_score)\n        return\n    \n    # For n > 3, we need to consider the middle three quarters\n    # We'll use binary search on the possible minimum scores\n    \n    def can_pass(threshold):\n        \"\"\"Check if we can achieve at least threshold with top 3 quarters\"\"\"\n        if n == 4:\n            # Special case: only 3 quarters needed\n            if threshold <= 2 * total_sum // (n + 1):\n                return True\n                \n            # Calculate required minimum score\n            min_required = 2 * total_sum // (n + 1) + 1\n            if min_required > threshold:\n                return False\n            \n            # Check if we can form a sum >= threshold using top 3 quarters\n            # This is tricky because we don't know which quarter to exclude\n            # But we can try all possibilities\n            \n            # First, calculate the sum of the top 3 quarters without any exclusion\n            top3_sum = sum(scores[n//2:])\n            \n            # Now try all 3 exclusions\n            for mask in range(1 << n):  # 1-based mask\n                # Get the indices of included quarters\n                included_indices = []\n                for i in range(n):\n                    if mask & (1 << i):\n                        included_indices.append(i)\n                \n                # Sort included indices by their original positions\n                included_scores = [scores[i] for i in included_indices]\n                included_scores.sort()\n                \n                # Calculate sum of top 3 without excluded\n                top3_ex"
+  },
+  {
+    "id": "abc321_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    n_str = str(n)\n    length = len(n_str)\n    \n    for i in range(length - 1):\n        if int(n_str[i]) <= int(n_str[i + 1]):\n            print(\"No\")\n            return\n    \n    print(\"Yes\")\n\nif __name__ == \"__main__\":\n    n = int(input().strip())"
+  },
+  {
+    "id": "abc322_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    import sys\n    data = sys.stdin.read().splitlines()\n    N = int(data[0])\n    S = data[1].strip()\n    \n    for i in range(N - 2):\n        if S[i:i+3] == 'ABC':\n            print(i + 1)\n            return\n    \n    print(-1)\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc322_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    import sys\n    data = sys.stdin.read().splitlines()\n    if not data:\n        return\n    \n    n, m = map(int, data[0].split())\n    s = data[1]\n    t = data[2]\n    \n    if s == t[:n]:\n        print(0)\n    elif s == t[-n:]:\n        print(1)\n    else:\n        print(3)\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc323_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    data = sys.stdin.read().splitlines()\n    if not data:\n        return\n    \n    n = int(data[0])\n    patterns = []\n    for i in range(1, 1 + n):\n        patterns.append(data[i].strip())\n    \n    # Precompute prefix sums for all patterns\n    prefix = [[0] * (n + 1) for _ in range(n + 1)]\n    for i in range(1, n + 1):\n        for j in range(1, n + 1):\n            if patterns[i - 1][j - 1] == 'x':\n                prefix[i][j] = prefix[i - 1][j] + 1\n            else:\n                prefix[i][j] = prefix[i - 1][j]\n    \n    # Precompute suffix sums for all patterns\n    suffix = [[0] * (n + 1) for _ in range(n + 1)]\n    for i in range(n, 0, -1):\n        for j in range(n, 0, -1):\n            if patterns[i - 1][j - 1] == 'x':\n                suffix[i][j] = suffix[i + 1][j] + 1\n            else:\n                suffix[i][j] = suffix[i + 1][j]\n    \n    # Precompute total sum for all patterns\n    total_sum = 0\n    for i in range(1, n + 1):\n        for j in range(1, n + 1):\n            if patterns[i - 1][j - 1] != '-':\n                total_sum += 1\n    \n    # Sort by total sum descending, then by player number ascending\n    result = sorted(range(1, n + 1), key=lambda x: (-total_sum, x))\n    print(' '.join(map(str, result)))\n\nif __name__ == '__main__':\n    main()"
+  },
+  {
+    "id": "abc323_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    S = input().strip()\n    correct = True\n    for i in range(2, 17, 2):\n        if S[i] != '0':\n            correct = False\n            break\n    print(\"Yes\" if correct else \"No\")\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc324_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    data = sys.stdin.read().split()\n    n = int(data[0])\n    first_value = int(data[1])\n    \n    for i in range(2, n + 1):\n        if int(data[i]) != first_value:\n            print(\"No\")\n            return\n    \n    print(\"Yes\")\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc324_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    N = int(input().strip())\n    \n    # Factorize N into prime factors\n    factors = {}\n    temp = N\n    \n    # Handle factor 2\n    while temp % 2 == 0:\n        factors[2] = factors.get(2, 0) + 1\n        temp //= 2\n    \n    # Check odd factors up to sqrt(N)\n    f = 3\n    max_f = int(math.isqrt(temp))\n    while f <= max_f and temp % f != 0:\n        while temp % f == 0:\n            factors[f] = factors.get(f, 0) + 1\n            temp //= f\n        f += 2\n    \n    # If temp is still greater than 1, it's a prime factor\n    if temp > 1:\n        factors[temp] = factors.get(temp, 0) + 1\n    \n    # Check for 3 as a potential exponent\n    if_3 = False\n    if 3 in factors:\n        if factors[3] >= 1:\n            is_3 = True\n        else:\n            is_3 = False\n    else:\n        is_3 = False\n    \n    # Check for other exponents\n    has_other_exponent = False\n    for exp in factors.values():\n        if exp > 1:\n            has_other_exponent = True\n            break\n    \n    if is_3 and not has_other_exponent:\n        print(\"Yes\")\n    else:\n        print(\"No\")\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc325_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    S, T = input().split()\n    print(f\"{S} san\")\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc326_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    N = int(sys.stdin.readline().strip())\n    \n    # Find the rightmost digit that can be increased\n    for i in range(2, -1, -1):\n        if (N // (10 ** i)) % 10 < 9:\n            # This digit can be incremented\n            new_number = N - (10 ** i) + ((N // (10 ** i)) % 10 + 1)\n            print(new_number)\n            return\n    \n    # If no digit can be incremented, it means we need to carry over\n    # But since we're looking for the smallest possible number,\n    # we'll just add 100 to make sure the first digit becomes 1\n    print(N + 100)\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc326_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    X, Y = map(int, input().split())\n    \n    # Check if difference is even\n    if (Y - X) % 3 == 0:\n        print(\"Yes\")\n    else:\n        print(\"No\")\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc327_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    data = sys.stdin.read().splitlines()\n    n = int(data[0])\n    s = data[1].strip()\n    \n    found = False\n    for i in range(n - 1):\n        if s[i] == 'a' and s[i + 1] == 'b':\n            found = True\n            break\n        elif s[i] == 'b' and s[i + 1] == 'a':\n            found = True\n            break\n    \n    print(\"Yes\" if found else \"No\")\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc327_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    B = int(input().strip())\n    \n    # Check if B is prime and greater than 1\n    if B > 1 and all(B % i != 0 for i in range(2, int(math.isqrt(B)) + 1)):\n        print(B)\n    else:\n        print(-1)\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc328_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    data = sys.stdin.read().split()\n    n = int(data[0])\n    d_list = list(map(int, data[1:1+n]))\n    \n    count = 0\n    \n    # Check each month\n    for i in range(1, n + 1):\n        # Convert month number to string\n        month_str = str(i)\n        \n        # Count occurrences of first digit\n        first_digit_count = d_list[i - 1].count(month_str[0])\n        \n        # Count occurrences of second digit (if exists)\n        second_digit_count = 0\n        if len(month_str) > 1:\n            second_digit_count = d_list[i - 1].count(month_str[1])\n        \n        # Total repdigit days in this month\n        total_repdigit_days = first_digit_count + second_digit_count\n        \n        # Add to overall count\n        count += total_repdigit_days\n    \n    print(count)\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc328_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    data = sys.stdin.read().split()\n    if not data:\n        return\n    \n    n = int(data[0])\n    x = int(data[1])\n    scores = list(map(int, data[2:2+n]))\n    \n    count = 0\n    for score in scores:\n        if score <= x:\n            count += 1\n            \n    print(count)\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc329_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "S = input().strip()\nfor char in S:\n    print(char, end=\" \")"
+  },
+  {
+    "id": "abc329_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    data = sys.stdin.read().split()\n    n = int(data[0])\n    arr = list(map(int, data[1:1+n]))\n    \n    max_val = max(arr)\n    count_max = arr.count(max_val)\n    \n    result = -1\n    for num in arr:\n        if num != max_val and arr.count(num) < count_max:\n            result = num\n            \n    print(result)\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc330_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    data = sys.stdin.read().split()\n    if not data:\n        return\n    \n    n = int(data[0])\n    L = int(data[1])\n    R = int(data[2])\n    \n    arr = list(map(int, data[3:3+n]))\n    \n    # Precompute prefix min and max arrays\n    prefix_min = [0] * (n + 1)\n    prefix_max = [0] * (n + 1)\n    \n    for i in range(1, n + 1):\n        prefix_min[i] = min(prefix_min[i-1], arr[i-1])\n        prefix_max[i] = max(prefix_max[i-1], arr[i-1])\n    \n    # Precompute suffix min and max arrays\n    suffix_min = [0] * (n + 1)\n    suffix_max = [0] * (n + 1)\n    \n    for i in range(n-1, -1, -1):\n        suffix_min[i] = min(suffix_min[i+1], arr[i])\n        suffix_max[i] = max(suffix_max[i+1], arr[i])\n    \n    results = []\n    for i in range(n):\n        left_val = arr[i]\n        right_val = arr[i]\n        \n        if L <= left_val:\n            candidate_left = max(left_val, prefix_min[L])\n        else:\n            candidate_left = min(left_val, prefix_max[L])\n            \n        if R >= right_val:\n            candidate_right = min(right_val, suffix_min[R])\n        else:\n            candidate_right = max(right_val, suffix_max[R])\n            \n        results.append(str(max(candidate_left, candidate_right)))\n    \n    print(\" \".join(results))\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc330_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    import sys\n    data = sys.stdin.read().split()\n    N = int(data[0])\n    L = int(data[1])\n    scores = list(map(int, data[2:2+N]))\n    \n    count = 0\n    for score in scores:\n        if score >= L:\n            count += 1\n            \n    print(count)\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc331_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    data = sys.stdin.read().split()\n    M = int(data[0])\n    D = int(data[1])\n    y = int(data[2])\n    m = int(data[3])\n    d = int(data[4])\n    \n    if d < D:\n        new_d = d + 1\n    else:\n        new_d = 1\n        if m < M:\n            new_m = m + 1\n        else:\n            new_m = 1\n            new_y = y + 1\n            \n    print(f\"{new_y} {new_m} {new_d}\")\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc331_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    N, S, M, L = map(int, input().split())\n    \n    # Precompute cost for k packs of 6 (k >= 0)\n    cost_6 = [float('inf')] * (N + 1)\n    if N >= 6:\n        cost_6[6] = S * 6\n    \n    # Precompute cost for k packs of 8 (k >= 0)\n    cost_8 = [float('inf')] * (N + 1)\n    if N >= 8:\n        cost_8[8] = M * 8\n    \n    # Precompute cost for k packs of 12 (k >= 0)\n    cost_12 = [float('inf')] * (N + 1)\n    if N >= 12:\n        cost_12[12] = L * 12\n    \n    # Fill cost_6 array using binary search\n    for i in range(7, N + 1):\n        low, high = 0, i // 6\n        while low <= high:\n            mid = (low + high) // 2\n            total_cost = mid * S * 6 + (i - mid * 6) * M\n            if cost_6[i] > total_cost:\n                cost_6[i] = total_cost\n            if total_cost < cost_6[i]:\n                low = mid + 1\n            else:\n                high = mid - 1\n    \n    # Fill cost_8 array using binary search\n    for i in range(8, N + 1):\n        low, high = 0, i // 8\n        while low <= high:\n            mid = (low + high) // 2\n            total_cost = mid * M * 8 + (i - mid * 8) * L\n            if cost_8[i] > total_cost:\n                cost_8[i] = total_cost\n            if total_cost < cost_8[i]:\n                low = mid + 1\n            else:\n                high = mid - 1\n    \n    # Fill cost_12 array using binary search\n    for i in range(12, N + 1):\n        low, high = 0, i // 12\n        while low <= high:\n            mid = (low + high) // 2\n            total_cost = mid * L * "
+  },
+  {
+    "id": "abc332_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    data = sys.stdin.read().split()\n    n = int(data[0])\n    S = int(data[1])\n    K = int(data[2])\n    \n    total_price = 0\n    for i in range(n):\n        p = int(data[3 + 2 * i])\n        q = int(data[4 + 2 * i])\n        total_price += p * q\n    \n    if total_price >= S:\n        shipping_fee = 0\n    else:\n        shipping_fee = K\n    \n    result = total_price + shipping_fee\n    print(result)\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc332_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    import sys\n    data = sys.stdin.read().split()\n    K = int(data[0])\n    G = int(data[1])\n    M = int(data[2])\n    \n    glass = 0\n    mug = 0\n    \n    for _ in range(K):\n        if glass == 0:\n            # Glass is empty - need to refill mug\n            mug += G\n        else:\n            # Transfer water from mug to glass until full\n            transfer_amount = min(glass, M - mug)\n            glass -= transfer_amount\n            mug += transfer_amount\n            \n    print(f\"{glass} {mug}\")\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc333_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    data = sys.stdin.read().splitlines()\n    s1, s2 = data[0].strip(), data[1].strip()\n    \n    # Convert to uppercase for case-insensitivity\n    s1 = s1.upper()\n    s2 = s2.upper()\n    \n    # Pentagon vertices: A, B, C, D, E\n    vertices = ['A', 'B', 'C', 'D', 'E']\n    \n    # Find indices of S1 and S2\n    idx_s1 = vertices.index(s1)\n    idx_s2 = vertices.index(s2)\n    \n    # Calculate distances using vertex order\n    dist1 = abs(idx_s1 - idx_s2) % 5\n    dist2 = 5 - dist1\n    \n    if dist1 == 1 or dist1 == 4:\n        print(\"Yes\")\n    elif dist2 == 1 or dist2 == 4:\n        print(\"Yes\")\n    else:\n        print(\"No\")\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc333_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    N = int(input().strip())\n    result = str(N) * N\n    print(result)\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc334_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    b, g = map(int, sys.stdin.readline().split())\n    if b > g:\n        print(\"Bat\")\n    else:\n        print(\"Glove\")\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc335_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "S = input().strip()\nprint(S[:-1] + '4')"
+  },
+  {
+    "id": "abc335_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    N = int(sys.stdin.readline().strip())\n    \n    for z in range(N + 1):\n        for y in range(N - z + 1):\n            x = N - z - y\n            print(f\"{x} {y} {z}\")\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc336_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    N = int(input().strip())\n    print('D' + 'o'*N + 'n' + 'g')\n\nif __name__ == '__main__':\n    main()"
+  },
+  {
+    "id": "abc336_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    N = int(input().strip())\n    \n    if N == 0:\n        print(0)\n        return\n        \n    # Convert to binary string and remove '0b' prefix\n    bin_str = bin(N)[2:]\n    \n    # Find first non-zero character\n    for i, char in enumerate(bin_str):\n        if char != '0':\n            print(i)\n            break\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc337_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    S = input().strip()\n    \n    # Check if all characters are 'A'\n    if any(c != 'A' for c in S):\n        print(\"No\")\n        return\n    \n    # Check if we can split into three parts with equal lengths\n    n = len(S)\n    part_length = n // 3\n    \n    # Check first part: \"AAA\"\n    if S[:3] == \"AAA\":\n        # Check second part: \"BBBBB\"\n        if S[3:6] == \"BBBB\":\n            # Check third part: \"CCCCC\"\n            if S[6:] == \"CCCC\":\n                print(\"Yes\")\n                return\n    \n    # Check second part: \"BBBA\"\n    if S[3:6] == \"BBBA\":\n        # Check middle part: \"AAAAA\"\n        if S[6:9] == \"AAAAA\":\n            # Check last part: \"CCCCC\"\n            if S[9:] == \"CCCCC\":\n                print(\"Yes\")\n                return\n    \n    # Check third part: \"CCCAA\"\n    if S[6:9] == \"AAAAA\":\n        # Check end part: \"BBBBBB\"\n        if S[9:] == \"BBBBBB\":\n            print(\"Yes\")\n            return\n    \n    # If none of the above match, it's not an Extended ABC string\n    print(\"No\")\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc337_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    import sys\n    data = sys.stdin.read().split()\n    \n    n = int(data[0])\n    takahashi_score = 0\n    aoki_score = 0\n    \n    for i in range(1, n + 1):\n        x = int(data[2 * i - 1])\n        y = int(data[2 * i])\n        takahashi_score += x\n        aoki_score += y\n        \n    if takahashi_score > aoki_score:\n        print(\"Takahashi\")\n    elif takahashi_score < aoki_score:\n        print(\"Aoki\")\n    else:\n        print(\"Draw\")\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc338_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    S = input().strip()\n    \n    if S[0].isupper() and all(char.islower() for char in S[1:]):\n        print(\"Yes\")\n    else:\n        print(\"No\")\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc338_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    s = sys.stdin.readline().strip()\n    \n    freq = {}\n    for char in s:\n        freq[char] = freq.get(char, 0) + 1\n    \n    max_freq = max(freq.values(), default=0)\n    candidates = [char for char, count in freq.items() if count == max_freq]\n    \n    # Sort candidates by their original order in S\n    sorted_chars = sorted(s)\n    result_char = None\n    for candidate in candidates:\n        index = sorted_chars.index(candidate)\n        if result_char is None or result_char > candidate:\n            result_char = candidate\n    \n    print(result_char)\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc339_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    S = input().strip()\n    parts = S.split('.')\n    result = parts[-1]\n    print(result)\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc340_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    data = sys.stdin.read().split()\n    if not data:\n        return\n    \n    n_queries = int(data[0])\n    queries = []\n    for i in range(n_queries):\n        idx = i * 2\n        query_type = int(data[idx])\n        if query_type == 1:\n            x = int(data[idx + 1])\n            queries.append((query_type, x))\n        else:\n            k = int(data[idx + 1])\n            queries.append((query_type, k))\n    \n    stack = []\n    results = [\"\" for _ in range(n_queries)]\n    result_idx = 0\n    \n    for query in queries:\n        query_type, val = query\n        \n        if query_type == 1:\n            stack.append(val)\n        else:\n            k = val - 1\n            while stack and len(stack) > k:\n                stack.pop(0)\n            \n            if stack:\n                results[result_idx] = str(stack[0])\n                result_idx += 1\n    \n    print(\"\\n\".join(results))\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc340_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    A, B, D = map(int, input().split())\n    \n    if D == 0:\n        print(A)\n    else:\n        n = (B - A) // D + 1\n        L = A + (n - 1) * D\n        print(' '.join(str(i) for i in range(A, L + 1, D)))\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc341_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    data = sys.stdin.read().split()\n    n = int(data[0])\n    A = list(map(int, data[1:1+n]))\n    idx = 1 + n\n    \n    # Precompute prefix sums for A\n    prefix_A = [0] * (n + 1)\n    for i in range(1, n + 1):\n        prefix_A[i] = prefix_A[i-1] + A[i-1]\n    \n    # Initialize DP with zeros\n    dp = [[0] * (n + 1) for _ in range(n + 1)]\n    \n    # Fill DP table\n    for i in range(n):\n        for j in range(i + 1, n + 1):\n            k = j - i\n            if k == 1:\n                continue\n                \n            # Check if we can buy enough from prefix_A[i] to get exactly k\n            if prefix_A[j] >= k * prefix_A[i]:\n                dp[i][j] = k\n                continue\n            \n            # Try all possible amounts to buy\n            max_takahashi = 0\n            for t in range(prefix_A[i], 0, -1):\n                if prefix_A[j] < t * prefix_A[i]:\n                    continue\n                    \n                remaining = prefix_A[j] - t * prefix_A[i]\n                if remaining >= k * prefix_A[i]:\n                    takahashi = min(tahashi, remaining // prefix_A[i])\n                    \n            if takahashi > 0:\n                dp[i][j] = takahashi\n    \n    # Find maximum value for destination country\n    result = 0\n    for i in range(n):\n        for j in range(i + 1, n + 1):\n            if dp[i][j] > result:\n                result = dp[i][j]\n                \n    print(result)\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc341_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    N = int(input().strip())\n    result = '1' + '0' * N\n    print(result)\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc342_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "S = input().strip()\nfirst_char = S[0]\nother_chars = [char for char in S if char != first_char]\nresult = other_chars.index(first_char) + 1\nprint(result)"
+  },
+  {
+    "id": "abc342_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    import sys\n    data = sys.stdin.read().split()\n    \n    n = int(data[0])\n    persons = list(map(int, data[1:1+n]))\n    q = int(data[1+n])\n    \n    # Initialize positions - initially all people are at position 1\n    positions = [1] * n\n    \n    results = []\n    index = 1 + n + 1\n    for _ in range(q):\n        a = int(data[index]); b = int(data[index+1])\n        index += 2\n        \n        if a == b:\n            results.append(str(persons[a-1]))\n            continue\n            \n        # Find the minimum position where we can insert without violating constraints\n        min_pos = float('inf')\n        \n        # Check each possible insertion point\n        for pos in range(1, n+1):\n            # Count how many people between a and b would be affected by inserting at this position\n            count = 0\n            for i in range(n):\n                if persons[i] >= a and persons[i] <= b:\n                    if positions[i] <= pos:\n                        count += 1\n                    elif positions[i] > pos:\n                        break\n            else:\n                # No people between a and b, or they're after our new position\n                if count <= min_pos:\n                    min_pos = count\n                    \n        results.append(str(min_pos))\n    \n    print(\"\\n\".join(results))\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc343_a",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    A, B = map(int, input().split())\n    result = [str(i) for i in range(10)]\n    result.remove(str(A + B))\n    print(result[0])\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc343_b",
+    "model": "deep_instruction_checkpoint-600",
+    "code": "def main():\n    data = sys.stdin.read().split()\n    n = int(data[0])\n    \n    adj_matrix = []\n    index = 1\n    for _ in range(n):\n        row = list(map(int, data[index:index+n]))\n        index += n\n        adj_matrix.append(row)\n    \n    result = []\n    for i in range(n):\n        connected = [str(j+1) for j in range(n) if adj_matrix[i][j] == 1]\n        result.append(' '.join(connected))\n    \n    print('\\n'.join(result))\n\nif __name__ == \"__main__\":\n    main()"
+  }
+]

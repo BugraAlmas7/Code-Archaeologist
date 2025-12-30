@@ -1,0 +1,382 @@
+[
+  {
+    "id": "abc301_a",
+    "model": "base_model",
+    "code": "def main():\n    n = int(input())\n    s = input()\n    takahashi_wins = s.count('T')\n    aoki_wins = s.count('A')\n    \n    if takahashi_wins > aoki_wins:\n        print(\"T\")\n    elif aoki_wins > takahashi_wins:\n        print(\"A\")\n    else:\n        print(\"T\" if s.index('T') < s.index('A') else \"A\")\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc301_b",
+    "model": "base_model",
+    "code": "def process_sequence(sequence):\n    while True:\n        # Check if all adjacent terms have a difference of 1\n        if all(abs(a - b) == 1 for a, b in zip(sequence, sequence[1:])):\n            break\n        \n        # Find the pair of adjacent terms with the smallest non-adjacent difference\n        min_diff = float('inf')\n        min_pair = None\n        for i in range(len(sequence) - 1):\n            diff = abs(sequence[i] - sequence[i + 1])\n            if diff < min_diff:\n                min_diff = diff\n                min_pair = (sequence[i], sequence[i + 1])\n        \n        # Determine the direction of insertion based on the smaller difference\n        if min_pair[0] < min_pair[1]:\n            sequence.insert(min_pair[0] + 1, *range(min_pair[0] + 1, min_pair[1]))\n        else:\n            sequence.insert(min_pair[1] - 1, *range(min_pair[1] - 1, min_pair[0], -1))\n    \n    return sequence\n\n# Read input\nN = int(input())\nsequence = list(map(int, input().split()))\n\n# Process the sequence\nresult = process_sequence(sequence)\n\n# Print the result\nprint(*result)"
+  },
+  {
+    "id": "abc302_a",
+    "model": "base_model",
+    "code": "def min_attacks(stamina, reduction):\n    return (stamina + reduction - 1) // reduction\n\n# Read input\nA, B = map(int, input().split())\n\n# Calculate the minimum number of attacks\nmin_attacks_needed = min_attacks(A, B)\n\n# Print the result\nprint(min_attacks_needed)"
+  },
+  {
+    "id": "abc303_b",
+    "model": "base_model",
+    "code": "def count_bad_moods(N, M, a):\n    # Create adjacency list for graph representation\n    adj = [[] for _ in range(N + 1)]\n    \n    # Build the graph based on the given matrix\n    for i in range(M):\n        for j in range(i + 1, M):\n            if a[i][j] != a[j][i]:\n                adj[a[i][j]].append(a[j][i])\n                adj[a[j][i]].append(a[i][j])\n    \n    # Initialize variables to keep track of bad mood pairs\n    bad_mood_pairs = 0\n    \n    # Perform DFS to find cycles in the graph\n    def dfs(node, visited, path):\n        visited[node] = True\n        path.append(node)\n        \n        for neighbor in adj[node]:\n            if not visited[neighbor]:\n                dfs(neighbor, visited, path)\n            elif neighbor in path:\n                # Found a cycle, increment bad mood pairs\n                bad_mood_pairs += len(path) - path.index(neighbor)\n    \n    # Mark all nodes as unvisited\n    visited = [False] * (N + 1)\n    \n    # Iterate through all nodes to find cycles\n    for node in range(1, N + 1):\n        if not visited[node]:\n            dfs(node, visited, [])\n    \n    return bad_mood_pairs\n\n# Read input\nN, M = map(int, input().split())\na = []\nfor _ in range(M):\n    row = list(map(int, input().split()))\n    a.append(row)\n\n# Print the result\nprint(count_bad_moods(N, M, a))"
+  },
+  {
+    "id": "abc303_a",
+    "model": "base_model",
+    "code": "def are_similar_strings(s, t):\n    return all(s[i] == t[i] or (s[i] == '1' and t[i] == 'o') or (s[i] == '0' and t[i] == 'l') for i in range(len(s)))\n\n# Read input\nN = int(input())\nS = input()\nT = input()\n\n# Check if S and T are similar strings\nprint(\"Yes\" if are_similar_strings(S, T) else \"No\")"
+  },
+  {
+    "id": "abc304_a",
+    "model": "base_model",
+    "code": "def print_seating_order(n):\n    # Read input\n    names = []\n    ages = []\n    for _ in range(n):\n        s, a = input().split()\n        names.append(s)\n        ages.append(int(a))\n    \n    # Sort by age\n    sorted_indices = sorted(range(n), key=lambda x: ages[x])\n    \n    # Print names in clockwise order\n    for i in sorted_indices:\n        print(names[i])\n\n# Example usage\nprint_seating_order(5)\nprint_seating_order(2)"
+  },
+  {
+    "id": "abc304_b",
+    "model": "base_model",
+    "code": "def truncate_number(N):\n    if N <= 10**3 - 1:\n        return N\n    elif N <= 10**4 - 1:\n        return int(str(N)[:-1])\n    elif N <= 10**5 - 1:\n        return int(str(N)[:-2])\n    elif N <= 10**6 - 1:\n        return int(str(N)[:-3])\n    elif N <= 10**7 - 1:\n        return int(str(N)[:-4])\n    elif N <= 10**8 - 1:\n        return int(str(N)[:-5])\n    else:\n        return int(str(N)[:-6])\n\n# Read input\nN = int(input())\n\n# Print the truncated number\nprint(truncate_number(N))"
+  },
+  {
+    "id": "abc305_a",
+    "model": "base_model",
+    "code": "def find_nearest_water_station(N):\n    # Calculate the number of water stations\n    num_stations = (N // 5) + 1\n    \n    # Determine the position of the nearest water station\n    if N % 5 == 0:\n        nearest_station = N - 4\n    else:\n        nearest_station = N - (N % 5)\n    \n    return nearest_station\n\n# Read input\nN = int(input())\n\n# Find and print the nearest water station\nprint(find_nearest_water_station(N))"
+  },
+  {
+    "id": "abc305_b",
+    "model": "base_model",
+    "code": "def calculate_distance(p, q):\n    # Define the distances between adjacent points\n    distances = {\n        'A': 3,\n        'B': 1,\n        'C': 4,\n        'D': 1,\n        'E': 5,\n        'F': 9,\n        'G': 0\n    }\n    \n    # Calculate the distance between p and q\n    if p == q:\n        return 0\n    else:\n        index_p = ord(p) - ord('A')\n        index_q = ord(q) - ord('A')\n        return distances[p] + distances[q]\n\n# Read input\np, q = input().split()\n\n# Calculate and print the distance\nprint(calculate_distance(p, q))"
+  },
+  {
+    "id": "abc306_a",
+    "model": "base_model",
+    "code": "def concatenate_strings(n, s):\n    result = \"\"\n    for char in s:\n        result += char * 2\n    return result\n\n# Read input\nn = int(input())\ns = input()\n\n# Concatenate strings\nresult = concatenate_strings(n, s)\n\n# Print the result\nprint(result)"
+  },
+  {
+    "id": "abc306_b",
+    "model": "base_model",
+    "code": "def calculate_sum(sequence):\n    return sum(a * (2 ** i) for i, a in enumerate(sequence))\n\n# Read input\nsequence = list(map(int, input().split()))\n\n# Calculate the sum\nresult = calculate_sum(sequence)\n\n# Print the result\nprint(result)"
+  },
+  {
+    "id": "abc307_a",
+    "model": "base_model",
+    "code": "def calculate_weekly_steps(steps):\n    weekly_steps = []\n    current_sum = 0\n    for step in steps:\n        current_sum += step\n        if len(weekly_steps) < 7:\n            weekly_steps.append(current_sum)\n        else:\n            weekly_steps.pop(0)\n            weekly_steps.append(current_sum)\n    return weekly_steps\n\n# Read input\nN = int(input())\nsteps = list(map(int, input().split()))\n\n# Calculate weekly steps\nweekly_steps = calculate_weekly_steps(steps)\n\n# Print the result\nprint(\" \".join(map(str, weekly_steps)))"
+  },
+  {
+    "id": "abc307_b",
+    "model": "base_model",
+    "code": "def is_palindrome(s):\n    return s == s[::-1]\n\ndef check_palindrome_pairs(strings):\n    n = len(strings)\n    for i in range(n):\n        for j in range(i + 1, n):\n            if is_palindrome(strings[i] + strings[j]):\n                return \"Yes\"\n    return \"No\"\n\n# Read input\nn = int(input())\nstrings = [input() for _ in range(n)]\n\n# Check for palindrome pairs\nresult = check_palindrome_pairs(strings)\nprint(result)"
+  },
+  {
+    "id": "abc308_a",
+    "model": "base_model",
+    "code": "def check_conditions(S):\n    # Check if the sequence is monotonically non-decreasing\n    if not all(S[i] <= S[i+1] for i in range(len(S)-1)):\n        return False\n    \n    # Check if all numbers are between 100 and 675\n    if not all(100 <= x <= 675 for x in S):\n        return False\n    \n    # Check if all numbers are multiples of 25\n    if not all(x % 25 == 0 for x in S):\n        return False\n    \n    return True\n\n# Read input\nS = list(map(int, input().split()))\n\n# Check conditions\nif check_conditions(S):\n    print(\"Yes\")\nelse:\n    print(\"No\")"
+  },
+  {
+    "id": "abc308_b",
+    "model": "base_model",
+    "code": "def calculate_total_price(N, M, colors, dishes, prices):\n    total_price = 0\n    for color in colors:\n        if color in dishes:\n            total_price += prices[dishes.index(color)]\n        else:\n            total_price += prices[0]\n    return total_price\n\n# Read input\nN, M = map(int, input().split())\ncolors = input().split()\ndishes = input().split()\nprices = list(map(int, input().split()))\n\n# Calculate and print the total price\nprint(calculate_total_price(N, M, colors, dishes, prices))"
+  },
+  {
+    "id": "abc309_a",
+    "model": "base_model",
+    "code": "def check_adjacent_horizontal(A, B):\n    # Check if A and B are within the valid range (1 to 9)\n    if not (1 <= A <= 9) or not (1 <= B <= 9):\n        return \"Invalid input\"\n    \n    # Check if A and B are adjacent horizontally\n    if abs(A - B) == 1:\n        return \"Yes\"\n    else:\n        return \"No\"\n\n# Read input values\nA, B = map(int, input().split())\n\n# Print the result\nprint(check_adjacent_horizontal(A, B))"
+  },
+  {
+    "id": "abc309_b",
+    "model": "base_model",
+    "code": "def shift_outer_squares(grid):\n    n = len(grid)\n    \n    # Create a copy of the grid to avoid modifying the original\n    result_grid = [row[:] for row in grid]\n    \n    # Shift the outer squares clockwise\n    for i in range(n):\n        for j in range(n):\n            if i == 0 or i == n - 1 or j == 0 or j == n - 1:\n                # Calculate the new position for the current cell\n                new_i = (i + 1) % n\n                new_j = (j + 1) % n\n                \n                # Assign the value from the new position to the current cell\n                result_grid[i][j] = result_grid[new_i][new_j]\n    \n    return result_grid\n\n# Read input\nn = int(input())\ngrid = []\nfor _ in range(n):\n    row = list(map(int, input().split()))\n    grid.append(row)\n\n# Shift the outer squares\nresult_grid = shift_outer_squares(grid)\n\n# Print the result\nfor row in result_grid:\n    print(' '.join(str(cell) for cell in row))"
+  },
+  {
+    "id": "abc310_a",
+    "model": "base_model",
+    "code": "def min_payment(N, P, Q, D):\n    # If the price of the dish is less than or equal to the discount coupon, use the coupon\n    if D <= Q:\n        return P - Q\n    \n    # Otherwise, pay the regular price\n    return P\n\n# Read input\nN, P, Q = map(int, input().split())\nD = list(map(int, input().split()))\n\n# Calculate the minimum payment\nmin_pay = min_payment(N, P, Q, D)\nprint(min_pay)"
+  },
+  {
+    "id": "abc310_b",
+    "model": "base_model",
+    "code": "def check_superiority(N, M, prices, functions):\n    for i in range(N):\n        for j in range(i + 1, N):\n            if # Check if prices are equal\n            if prices[i] == prices[j]:\n                continue\n            \n            # Check if functions are equal\n            if set(functions[i]) == set(functions[j]):\n                continue\n            \n            # Check if prices are greater than j's price or j's functions are missing some\n            if prices[i] > prices[j] or any(f not in functions[j] for f in functions[i]):\n                return \"Yes\"\n    \n    return \"No\"\n\n# Read input\nimport sys\ninput = sys.stdin.read\ndata = input().split()\nN, M = map(int, data[:2])\nprices = [int(data[2 * i]) for i in range(1, 2 * N, 2)]\nfunctions = [[int(x) for x in data[2 * i + 1].split()] for i in range(1, 2 * N, 2)]\n\n# Print result\nprint(check_superiority(N, M, prices, functions))"
+  },
+  {
+    "id": "abc311_a",
+    "model": "base_model",
+    "code": "def count_characters(S):\n    count_A = count_B = count_C = 0\n    for char in S:\n        if char == 'A':\n            count_A += 1\n        elif char == 'B':\n            count_B += 1\n        else:\n            count_C += 1\n        if count_A > 0 and count_B > 0 and count_C > 0:\n            return len(S)\n    return len(S)\n\n# Read input\nN = int(input())\nS = input()\n\n# Print the result\nprint(count_characters(S))"
+  },
+  {
+    "id": "abc311_b",
+    "model": "base_model",
+    "code": "def max_free_days(N, D, schedules):\n    free_days = [0] * D\n    for schedule in schedules:\n        for i in range(D):\n            if schedule[i] == 'o':\n                free_days[i] += 1\n    \n    max_days = 0\n    current_days = 0\n    for day in free_days:\n        current_days += day\n        if current_days > max_days:\n            max_days = current_days\n        if current_days < 0:\n            current_days = 0\n    \n    return max_days if max_days > 0 else 0\n\n# Read input\nN, D = map(int, input().split())\nschedules = []\nfor _ in range(N):\n    schedules.append(input())\n\n# Print output\nprint(max_free_days(N, D, schedules))"
+  },
+  {
+    "id": "abc312_a",
+    "model": "base_model",
+    "code": "def check_string(S):\n    strings = [\"ACE\", \"BDF\", \"CEG\", \"DFA\", \"EGB\", \"FAC\", \"GBD\"]\n    return S in strings\n\n# Read input\nS = input()\n\n# Check and print result\nif check_string(S):\n    print(\"Yes\")\nelse:\n    print(\"No\")"
+  },
+  {
+    "id": "abc312_b",
+    "model": "base_model",
+    "code": "def find_tak_code_regions(grid):\n    n, m = len(grid), len(grid[0])\n    tak_code_regions = []\n\n    for i in range(n - 2):\n        for j in range(m - 2):\n            if all(grid[i][j] == '#' for i in range(i, i + 3)) and \\\n               all(grid[i][j + 1] == '#' for i in range(i, i + 3)) and \\\n               all(grid[i][j + 2] == '#' for i in range(i, i + 3)) and \\\n               all(grid[i + 1][j] == '.' for i in range(i, i + 3)) and \\\n               all(grid[i + 1][j + 1] == '.' for i in range(i, i + 3)) and \\\n               all(grid[i + 1][j + 2] == '.' for i in range(i, i + 3)) and \\\n               all(grid[i + 2][j] == '.' for i in range(i, i + 3)) and \\\n               all(grid[i + 2][j + 1] == '.' for i in range(i, i + 3)) and \\\n               all(grid[i + 2][j + 2] == '.' for i in range(i, i + 3)):\n                tak_code_regions.append((i + 1, j + 1))\n\n    return tak_code_regions\n\n# Read input\nn, m = map(int, input().split())\ngrid = [input() for _ in range(n)]\n\n# Find and print Tak Code regions\ntak_code_regions = find_tak_code_regions(grid)\nfor region in tak_code_regions:\n    print(*region)"
+  },
+  {
+    "id": "abc313_a",
+    "model": "base_model",
+    "code": "def find_minimum_points(N, scores):\n    min_score = min(scores)\n    return max(0, min_score - scores[0])\n\n# Read input\nN = int(input())\nscores = list(map(int, input().split()))\n\n# Find and print the result\nprint(find_minimum_points(N, scores))"
+  },
+  {
+    "id": "abc314_a",
+    "model": "base_model",
+    "code": "import math\n\ndef truncate_pi_to_n_decimal_places(n):\n    return \"{:.{}f}\".format(math.pi, n)\n\n# Read input\nN = int(input())\n\n# Print the truncated value of pi to N decimal places\nprint(truncate_pi_to_n_decimal_places(N))"
+  },
+  {
+    "id": "abc314_b",
+    "model": "base_model",
+    "code": "def find_people_with_fewest_bets(N, C, A, X):\n    counts = [0] * N\n    for i in range(N):\n        for j in range(C[i]):\n            if A[i][j] == X:\n                counts[i] += 1\n    \n    min_count = min(counts)\n    people_with_min_count = [i + 1 for i, count in enumerate(counts) if count == min_count]\n    \n    return len(people_with_min_count), ' '.join(map(str, people_with_min_count))\n\n# Read input\nN = int(input())\nC = list(map(int, input().split()))\nA = []\nfor _ in range(N):\n    A.append(list(map(int, input().split())))\nX = int(input())\n\n# Find and print the result\nresult = find_people_with_fewest_bets(N, C, A, X)\nprint(result[0])\nprint(result[1])"
+  },
+  {
+    "id": "abc315_b",
+    "model": "base_model",
+    "code": "def find_middle_day(M, D):\n    total_days = sum(D)\n    if total_days % 2 == 0:\n        return (total_days // 2) + 1, 1\n    else:\n        return (total_days // 2), 1\n\n# Read input\nM = int(input())\nD = list(map(int, input().split()))\n\n# Find the middle day\na, b = find_middle_day(M, D)\n\n# Print the result\nprint(a, b)"
+  },
+  {
+    "id": "abc315_a",
+    "model": "base_model",
+    "code": "def remove_vowels(s):\n    return ''.join(c for c in s if c not in 'aeiou')\n\n# Read input\ninput_string = input()\n\n# Remove vowels\nresult = remove_vowels(input_string)\n\n# Print result\nprint(result)"
+  },
+  {
+    "id": "abc318_b",
+    "model": "base_model",
+    "code": "def calculate_area(n):\n    total_area = 0\n    for _ in range(n):\n        A, B, C, D = map(int, input().split())\n        total_area += (B - A) * (D - C)\n    return total_area\n\n# Read the number of sheets\nn = int(input())\n\n# Calculate the total area covered by the sheets\ntotal_area = calculate_area(n)\n\n# Print the result\nprint(total_area)"
+  },
+  {
+    "id": "abc318_a",
+    "model": "base_model",
+    "code": "def count_full_moons(N, M, P):\n    # Calculate the number of full moons before day N\n    full_moons_before = (N - M) // P\n    \n    # If there's any remainder, add one more full moon\n    if (N - M) % P != 0:\n        full_moons_before += 1\n    \n    return full_moons_before\n\n# Read input\nN, M, P = map(int, input().split())\n\n# Print the result\nprint(count_full_moons(N, M, P))"
+  },
+  {
+    "id": "abc319_b",
+    "model": "base_model",
+    "code": "def print_divisor_string(N):\n    result = []\n    for i in range(N + 1):\n        found = False\n        for j in range(1, 10):\n            if N % j == 0 and i % (N // j) == 0:\n                result.append(str(j))\n                found = True\n                break\n        if not found:\n            result.append('-')\n    return ''.join(result)\n\n# Read input\nN = int(input())\n\n# Print the result\nprint(print_divisor_string(N))"
+  },
+  {
+    "id": "abc320_b",
+    "model": "base_model",
+    "code": "def longest_palindrome(s):\n    n = len(s)\n    dp = [[False] * n for _ in range(n)]\n    \n    # All single characters are palindromes\n    for i in range(n):\n        dp[i][i] = True\n    \n    # Check substrings of length 2\n    for i in range(n - 1):\n        if s[i] == s[i + 1]:\n            dp[i][i + 1] = True\n    \n    # Check substrings of length 3 or more\n    for length in range(3, n + 1):\n        for start in range(n - length + 1):\n            end = start + length - 1\n            if s[start] == s[end] and dp[start + 1][end - 1]:\n                dp[start][end] = True\n    \n    max_length = 0\n    for i in range(n):\n        for j in range(i, n):\n            if dp[i][j]:\n                max_length = max(max_length, j - i + 1)\n    \n    return max_length\n\n# Read input\ns = input().strip()\n\n# Print output\nprint(longest_palindrome(s))"
+  },
+  {
+    "id": "abc320_a",
+    "model": "base_model",
+    "code": "def calculate_expression(A, B):\n    return A**B + B**A\n\n# Read input\nA, B = map(int, input().split())\n\n# Calculate and print the result\nprint(calculate_expression(A, B))"
+  },
+  {
+    "id": "abc321_b",
+    "model": "base_model",
+    "code": "def min_score_needed(N, X, scores):\n    # Sort the scores\n    scores.sort()\n    \n    # Calculate the sum of the middle N-2 scores\n    mid_sum = sum(scores[1:-1])\n    \n    # Check if the minimum score needed is less than or equal to X\n    if mid_sum >= X:\n        return mid_sum\n    \n    # If not, check if it's possible to achieve X with the given scores\n    for i in range(len(scores)):\n        if scores[i] == max(scores):\n            continue\n        new_scores = scores[:i] + scores[i+1:]\n        new_mid_sum = sum(new_scores[1:-1])\n        if new_mid_sum >= X:\n            return new_mid_sum\n    \n    # If no such score exists, return -1\n    return -1\n\n# Read input\nN, X = map(int, input().split())\nscores = list(map(int, input().split()))\n\n# Print the result\nprint(min_score_needed(N, X, scores))"
+  },
+  {
+    "id": "abc321_a",
+    "model": "base_model",
+    "code": "def is_321_like_number(n):\n    n_str = str(n)\n    return all(int(n_str[i]) > int(n_str[i + 1]) for i in range(len(n_str) - 1))\n\n# Read input\nN = int(input())\n\n# Check if N is a 321-like number\nif is_321_like_number(N):\n    print(\"Yes\")\nelse:\n    print(\"No\")"
+  },
+  {
+    "id": "abc322_a",
+    "model": "base_model",
+    "code": "def find_abc_position(N, S):\n    for i in range(1, N - 1):\n        if S[i:i+3] == 'ABC':\n            return i + 1\n    return -1\n\n# Read input\nN = int(input())\nS = input()\n\n# Find and print the position of ABC\nprint(find_abc_position(N, S))"
+  },
+  {
+    "id": "abc322_b",
+    "model": "base_model",
+    "code": "def check_prefix_suffix(N, M, S, T):\n    if N == M:\n        return 0\n    elif S == T[:N]:\n        return 1\n    elif S == T[-N:]:\n        return 2\n    else:\n        return 3\n\n# Read input\nN, M = map(int, input().split())\nS = input()\nT = input()\n\n# Check and print the result\nprint(check_prefix_suffix(N, M, S, T))"
+  },
+  {
+    "id": "abc323_b",
+    "model": "base_model",
+    "code": "def rank_players(matches):\n    # Initialize a list to store the number of wins for each player\n    wins = [0] * len(matches)\n    \n    # Count the number of wins for each player\n    for match in matches:\n        for i in range(len(match)):\n            if match[i] == 'x':\n                wins[i] += 1\n    \n    # Sort the players based on the number of wins and then by their player number\n    sorted_players = sorted(range(len(wins)), key=lambda x: (-wins[x], x))\n    \n    return sorted_players[::-1]\n\n# Read input\nn = int(input())\nmatches = []\nfor _ in range(n):\n    matches.append(input())\n\n# Get the ranked players\nranked_players = rank_players(matches)\n\n# Print the ranked players\nprint(' '.join(map(str, ranked_players)))"
+  },
+  {
+    "id": "abc323_a",
+    "model": "base_model",
+    "code": "def check_even_positions(S):\n    for i in range(2, len(S), 2):\n        if S[i] != '0':\n            return \"No\"\n    return \"Yes\"\n\n# Read input\nS = input()\n\n# Check and print result\nprint(check_even_positions(S))"
+  },
+  {
+    "id": "abc324_a",
+    "model": "base_model",
+    "code": "def check_equal_values(n, arr):\n    return \"Yes\" if len(set(arr)) == 1 else \"No\"\n\n# Read input\nn = int(input())\narr = list(map(int, input().split()))\n\n# Check and print result\nprint(check_equal_values(n, arr))"
+  },
+  {
+    "id": "abc324_b",
+    "model": "base_model",
+    "code": "def check_condition(N):\n    while N % 2 == 0:\n        N //= 2\n    while N % 3 == 0:\n        N //= 3\n    return N == 1\n\nN = int(input())\nprint(\"Yes\" if check_condition(N) else \"No\")"
+  },
+  {
+    "id": "abc325_a",
+    "model": "base_model",
+    "code": "def print_honorific(surname, first_name):\n    return f\"{surname} {first_name} san\"\n\n# Read input\nsurname = input()\nfirst_name = input()\n\n# Print the result\nprint(print_honorific(surname, first_name))"
+  },
+  {
+    "id": "abc326_b",
+    "model": "base_model",
+    "code": "def find_smallest_326_like_number(N):\n    # Find the largest digit less than or equal to N/100\n    max_hundreds_digit = int(N / 100)\n    \n    # Find the largest digit less than or equal to (N % 100) / 10\n    max_tens_digit = int((N % 100) / 10)\n    \n    # Calculate the ones digit\n    ones_digit = N % 10\n    \n    # Create the 326-like number\n    if max_hundreds_digit * max_tens_digit == ones_digit:\n        return max_hundreds_digit * 100 + max_tens_digit * 10 + ones_digit\n    else:\n        # If no such number exists, return the next possible 326-like number\n        return max_hundreds_digit * 100 + max_tens_digit * 10 + ones_digit + 1\n\n# Read input\nN = int(input())\n\n# Find and print the result\nprint(find_smallest_326_like_number(N))"
+  },
+  {
+    "id": "abc326_a",
+    "model": "base_model",
+    "code": "def can_use_stairs(X, Y):\n    # Check if the difference between X and Y is divisible by 5\n    return (Y - X) % 5 == 0\n\n# Read input\nX, Y = map(int, input().split())\n\n# Determine if Takahashi uses the stairs\nif can_use_stairs(X, Y):\n    print(\"Yes\")\nelse:\n    print(\"No\")"
+  },
+  {
+    "id": "abc327_a",
+    "model": "base_model",
+    "code": "def check_adjacent_occurrences(s):\n    for i in range(len(s) - 1):\n        if s[i] == 'a' and s[i + 1] == 'b':\n            return \"Yes\"\n        elif s[i] == 'b' and s[i + 1] == 'a':\n            return \"Yes\"\n    return \"No\"\n\n# Read input\nN = int(input())\nS = input()\n\n# Check and print result\nprint(check_adjacent_occurrences(S))"
+  },
+  {
+    "id": "abc327_b",
+    "model": "base_model",
+    "code": "def find_integer(A):\n    if A**A == B:\n        return A\n    else:\n        return -1\n\n# Read input\nB = int(input())\n\n# Find and print the result\nresult = find_integer(B)\nprint(result)"
+  },
+  {
+    "id": "abc328_b",
+    "model": "base_model",
+    "code": "def count_repdigit_days(N, D):\n    count = 0\n    for i in range(1, N + 1):\n        for j in range(1, D[i] + 1):\n            if len(set(str(i))) == len(set(str(j))):\n                count += 1\n    return count\n\n# Read input\nN = int(input())\nD = list(map(int, input().split()))\n\n# Print result\nprint(count_repdigit_days(N, D))"
+  },
+  {
+    "id": "abc328_a",
+    "model": "base_model",
+    "code": "def calculate_total_score(N, X, scores):\n    return sum(score for score in scores if score <= X)\n\n# Read input\nN, X = map(int, input().split())\nscores = list(map(int, input().split()))\n\n# Calculate and print the result\nprint(calculate_total_score(N, X, scores))"
+  },
+  {
+    "id": "abc329_a",
+    "model": "base_model",
+    "code": "s = input()\nprint(' '.join(s))"
+  },
+  {
+    "id": "abc329_b",
+    "model": "base_model",
+    "code": "def find_largest_not_largest(N, A):\n    # Sort the list of numbers\n    sorted_A = sorted(A)\n    \n    # The second last element is the largest number that is not the largest\n    return sorted_A[-2]\n\n# Read input\nN = int(input())\nA = list(map(int, input().split()))\n\n# Print the result\nprint(find_largest_not_largest(N, A))"
+  },
+  {
+    "id": "abc330_b",
+    "model": "base_model",
+    "code": "def find_x(N, L, R, A):\n    # Sort the array A\n    A.sort()\n    \n    # Initialize the result list\n    result = []\n    \n    # Iterate through each element in A\n    for i in range(N):\n        # Calculate the minimum value between L and A[i]\n        min_val = max(L, A[i])\n        \n        # Calculate the maximum value between R and A[i]\n        max_val = min(R, A[i] + (R - L))\n        \n        # Append the calculated value to the result list\n        result.append(max_val)\n    \n    return ' '.join(map(str, result))\n\n# Read input\nN, L, R = map(int, input().split())\nA = list(map(int, input().split()))\n\n# Print the result\nprint(find_x(N, L, R, A))"
+  },
+  {
+    "id": "abc330_a",
+    "model": "base_model",
+    "code": "def count_passed_students(N, L, scores):\n    return sum(1 for score in scores if score >= L)\n\n# Read input\nN, L = map(int, input().split())\nscores = list(map(int, input().split()))\n\n# Count and print the number of students who passed\nprint(count_passed_students(N, L, scores))"
+  },
+  {
+    "id": "abc331_a",
+    "model": "base_model",
+    "code": "def next_day(year, month, day):\n    if month == 12 and day == 31:\n        return year + 1, 1, 1\n    elif day < D:\n        return year, month, day + 1\n    else:\n        return year, month + 1, 1\n\n# Read input\nM, D = map(int, input().split())\ny, m, d = map(int, input().split())\n\n# Calculate the next day\nnext_y, next_m, next_d = next_day(y, m, d)\n\n# Print the result\nprint(next_y, next_m, next_d)"
+  },
+  {
+    "id": "abc331_b",
+    "model": "base_model",
+    "code": "def min_money(N, S, M, L):\n    # Calculate the cost per egg for each pack size\n    cost_per_egg_6 = S / 6\n    cost_per_egg_8 = M / 8\n    cost_per_egg_12 = L / 12\n    \n    # Initialize variables to store the minimum cost and the corresponding number of packs\n    min_cost = float('inf')\n    best_packs = []\n    \n    # Iterate through possible combinations of packs\n    for num_6 in range(N // 6 + 1):\n        remaining_eggs_after_6 = N - (num_6 * 6)\n        if remaining_eggs_after_6 >= 0:\n            for num_8 in range(remaining_eggs_after_6 // 8 + 1):\n                remaining_eggs_after_8 = remaining_eggs_after_6 - (num_8 * 8)\n                if remaining_eggs_after_8 >= 0:\n                    num_12 = remaining_eggs_after_8 // 12\n                    total_cost = (num_6 * cost_per_egg_6) + (num_8 * cost_per_egg_8) + (num_12 * cost_per_egg_12)\n                    if total_cost < min_cost:\n                        min_cost = total_cost\n                        best_packs = [num_6, num_8, num_12]\n    \n    return min_cost\n\n# Read input\nN, S, M, L = map(int, input().split())\n\n# Print the result\nprint(min_money(N, S, M, L))"
+  },
+  {
+    "id": "abc332_a",
+    "model": "base_model",
+    "code": "def calculate_total_cost(N, S, K, prices, quantities):\n    total_price = sum(price * quantity for price, quantity in zip(prices, quantities))\n    \n    if total_price >= S:\n        shipping_fee = 0\n    else:\n        shipping_fee = K\n    \n    return total_price + shipping_fee\n\n# Read input\nimport sys\ninput = sys.stdin.read\ndata = input().split()\nN, S, K = map(int, data)\nprices = list(map(int, data[N:N+N]))\nquantities = list(map(int, data[N+N:2*N]))\n\n# Calculate and print the total cost\nprint(calculate_total_cost(N, S, K, prices, quantities))"
+  },
+  {
+    "id": "abc332_b",
+    "model": "base_model",
+    "code": "def main():\n    K, G, M = map(int, input().split())\n    \n    glass = 0\n    mug = 0\n    \n    for _ in range(K):\n        if glass == 0:\n            mug += G\n        elif mug == 0:\n            glass += G\n        else:\n            while glass < G and mug > 0:\n                glass += 1\n                mug -= 1\n    \n    print(glass, mug)\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc333_b",
+    "model": "base_model",
+    "code": "def check_line_segments(s1, s2, t1, t2):\n    # Define the lengths of the sides of the pentagon\n    side_length = 5\n    \n    # Calculate the distance between two points on a circle with radius side_length\n    def distance(p1, p2):\n        return ((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)**0.5\n    \n    # Convert the coordinates to Cartesian coordinates\n    def to_cartesian(x, y):\n        return (x * side_length / 2, y * side_length / 2)\n    \n    # Calculate the coordinates of the points\n    S1 = to_cartesian(0, 0)\n    S2 = to_cartesian(side_length, 0)\n    T1 = to_cartesian(-side_length / 2, side_length / 2)\n    T2 = to_cartesian(side_length / 2, side_length / 2)\n    \n    # Check if the distances are equal\n    if distance(S1, S2) == distance(T1, T2):\n        return \"Yes\"\n    else:\n        return \"No\"\n\n# Read input\ns1, s2, t1, t2 = input().split()\n\n# Print the result\nprint(check_line_segments(s1, s2, t1, t2))"
+  },
+  {
+    "id": "abc333_a",
+    "model": "base_model",
+    "code": "# Read the input number\nN = int(input())\n\n# Concatenate N copies of the digit N\nresult = N * str(N)\n\n# Print the result\nprint(result)"
+  },
+  {
+    "id": "abc334_a",
+    "model": "base_model",
+    "code": "# Read input values\nB, G = map(int, input().split())\n\n# Determine and print the gift\nif B > G:\n    print(\"Bat\")\nelse:\n    print(\"Glove\")"
+  },
+  {
+    "id": "abc335_a",
+    "model": "base_model",
+    "code": "def modify_string(s):\n    return s[:-1] + '4'\n\n# Read input\ninput_str = input()\n\n# Modify the string\nmodified_str = modify_string(input_str)\n\n# Print the result\nprint(modified_str)"
+  },
+  {
+    "id": "abc335_b",
+    "model": "base_model",
+    "code": "def print_triples(N):\n    for x in range(N + 1):\n        for y in range(N - x + 1):\n            z = N - x - y\n            print(f\"{x} {y} {z}\")\n\n# Example usage\nprint_triples(3)\nprint_triples(4)"
+  },
+  {
+    "id": "abc336_a",
+    "model": "base_model",
+    "code": "def dragon_string(level):\n    return \"L\" + \"o\" * level + \"n\" + \"g\"\n\n# Read input\nN = int(input())\n\n# Print the Dragon String of level N\nprint(dragon_string(N))"
+  },
+  {
+    "id": "abc336_b",
+    "model": "base_model",
+    "code": "def ctz(n):\n    return bin(n).count('0') - 1 if n > 0 else 0\n\n# Read input\nN = int(input())\n\n# Print the result\nprint(ctz(N))"
+  },
+  {
+    "id": "abc337_b",
+    "model": "base_model",
+    "code": "def is_extended_abc(s):\n    if len(s) == 0:\n        return True\n    \n    # Check if the string contains only one character\n    if len(set(s)) == 1:\n        return True\n    \n    # Check if the string can be split into three parts: A, B, and C\n    for i in range(1, len(s)):\n        for j in range(i + 1, len(s)):\n            if s[:i] == 'A' * i and s[i:j] == 'B' * (j - i) and s[j:] == 'C' * (len(s) - j):\n                return True\n    \n    return False\n\n# Read input\ns = input()\n\n# Print result\nif is_extended_abc(s):\n    print(\"Yes\")\nelse:\n    print(\"No\")"
+  },
+  {
+    "id": "abc337_a",
+    "model": "base_model",
+    "code": "def main():\n    n = int(input())\n    takahashi_score = 0\n    aoki_score = 0\n    \n    for _ in range(n):\n        x, y = map(int, input().split())\n        takahashi_score += x\n        aoki_score += y\n    \n    if takahashi_score > aoki_score:\n        print(\"Takahashi\")\n    elif takahashi_score < aoki_score:\n        print(\"Aoki\")\n    else:\n        print(\"Draw\")\n\nif __name__ == \"__main__\":\n    main()"
+  },
+  {
+    "id": "abc338_a",
+    "model": "base_model",
+    "code": "def check_condition(s):\n    if s[0].isupper() and all(char.islower() for char in s[1:]):\n        return \"Yes\"\n    else:\n        return \"No\"\n\n# Read input\ninput_string = input()\n\n# Check the condition\nresult = check_condition(input_string)\n\n# Print the result\nprint(result)"
+  },
+  {
+    "id": "abc338_b",
+    "model": "base_model",
+    "code": "from collections import Counter\n\ndef find_most_frequent_char(s):\n    char_count = Counter(s)\n    max_freq = max(char_count.values())\n    return min([char for char, freq in char_count.items() if freq == max_freq])\n\n# Read input\ns = input()\n\n# Find and print the most frequent character\nprint(find_most_frequent_char(s))"
+  },
+  {
+    "id": "abc339_a",
+    "model": "base_model",
+    "code": "def find_last_suffix(s):\n    for i in range(len(s) - 1, -1, -1):\n        if s[i] == '.':\n            return s[i+1:]\n    return \"\"\n\n# Read input\ninput_string = input()\n\n# Find and print the last suffix\nlast_suffix = find_last_suffix(input_string)\nprint(last_suffix)"
+  },
+  {
+    "id": "abc340_b",
+    "model": "base_model",
+    "code": "def process_queries():\n    n = int(input())\n    A = []\n    for _ in range(n):\n        query = list(map(int, input().split()))\n        if query[0] == 1:\n            A.append(query[1])\n        elif query[0] == 2:\n            print(A[-query[1]])\n\nprocess_queries()"
+  },
+  {
+    "id": "abc340_a",
+    "model": "base_model",
+    "code": "def print_arithmetic_sequence(A, B, D):\n    if A > B or D <= 0:\n        return \"Invalid input\"\n    \n    sequence = []\n    current_term = A\n    \n    while current_term <= B:\n        sequence.append(current_term)\n        current_term += D\n    \n    return ' '.join(map(str, sequence))\n\n# Read input\nA, B, D = map(int, input().split())\n\n# Print the arithmetic sequence\nprint(print_arithmetic_sequence(A, B, D))"
+  },
+  {
+    "id": "abc341_b",
+    "model": "base_model",
+    "code": "def max_currency_units(N, A, S, T):\n    # Sort the countries by their initial amount of currency\n    sorted_countries = sorted(zip(A, range(1, N + 1)), key=lambda x: x[0], reverse=True)\n    \n    total_units = 0\n    \n    for _, country in sorted_countries:\n        # If there are enough units of the current country's currency to perform the operation\n        if total_units >= S[country - 1]:\n            # Perform the operation\n            total_units += T[country - 1]\n        \n        # Add the remaining units of the current country's currency to the total\n        total_units += A[country - 1]\n    \n    return total_units\n\n# Read input\nN = int(input())\nA = list(map(int, input().split()))\nS = list(map(int, input().split()))\nT = list(map(int, input().split()))\n\n# Print the result\nprint(max_currency_units(N, A, S, T))"
+  },
+  {
+    "id": "abc341_a",
+    "model": "base_model",
+    "code": "def print_alternating_zeros_and_ones(n):\n    return '1' + '0' * n\n\n# Read input\nn = int(input())\n\n# Print the result\nprint(print_alternating_zeros_and_ones(n))"
+  },
+  {
+    "id": "abc342_a",
+    "model": "base_model",
+    "code": "def find_difference_index(s):\n    # Find the index of the differing character\n    for i in range(len(s)):\n        if s[i] != s[0]:\n            return i\n\n# Read input\ns = input()\n\n# Find the difference index\nindex = find_difference_index(s)\n\n# Print the result\nprint(index)"
+  },
+  {
+    "id": "abc342_b",
+    "model": "base_model",
+    "code": "def find_further_to_front(N, P, Q, A, B):\n    # Create a list to store the positions of each person\n    positions = [i + 1 for i in range(N)]\n    \n    # Sort the positions based on their values\n    positions.sort()\n    \n    # Process each query\n    results = []\n    for a, b in zip(A, B):\n        # Find the index of the first occurrence of 'a' in the sorted list\n        index_a = positions.index(a)\n        \n        # Find the index of the last occurrence of 'b' in the sorted list\n        index_b = positions.rindex(b)\n        \n        # If 'a' is before 'b', the result is 'a'\n        if index_a < index_b:\n            results.append(index_a)\n        else:\n            # Otherwise, the result is 'b'\n            results.append(index_b)\n    \n    return results\n\n# Read input\nN = int(input())\nP = list(map(int, input().split()))\nQ = int(input())\nA = list(map(int, input().split()))\nB = list(map(int, input().split()))\n\n# Process queries\nresults = find_further_to_front(N, P, Q, A, B)\n\n# Print results\nfor result in results:\n    print(result)"
+  },
+  {
+    "id": "abc343_a",
+    "model": "base_model",
+    "code": "# Read input values for A and B\nA, B = map(int, input().split())\n\n# Calculate the sum of A and B\nsum_AB = A + B\n\n# Print any integer between 0 and 9, inclusive, that is not equal to A + B\nfor i in range(10):\n    if i != sum_AB:\n        print(i)\n        break"
+  },
+  {
+    "id": "abc343_b",
+    "model": "base_model",
+    "code": "def find_connected_vertices(N, adj_matrix):\n    connected_vertices = [[] for _ in range(N)]\n    \n    for i in range(N):\n        for j in range(i + 1, N):\n            if adj_matrix[i][j] == 1:\n                connected_vertices[i].append(j)\n                connected_vertices[j].append(i)\n    \n    for i in range(N):\n        print(\" \".join(map(str, sorted(connected_vertices[i])))\n\n# Read input\nN = int(input())\nadj_matrix = [list(map(int, input().split())) for _ in range(N)]\n\n# Find and print connected vertices\nfind_connected_vertices(N, adj_matrix)"
+  }
+]
