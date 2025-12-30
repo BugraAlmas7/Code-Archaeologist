@@ -1,0 +1,222 @@
+import os
+import sys
+import json
+import torch
+import subprocess
+from google.colab import drive
+from datetime import datetime
+from tqdm import tqdm
+
+# ==============================================================================
+# 1. KURULUM VE AYARLAR
+# ==============================================================================
+print(" SİSTEM HAZIRLANIYOR (Code Arkeoloğu & Benchmark)...")
+
+try:
+    import unsloth
+    from unsloth import FastLanguageModel
+    from datasets import load_dataset
+    print(" Kütüphaneler zaten yüklü.")
+except ImportError:
+    print(" Gerekli kütüphaneler kuruluyor (Unsloth, Datasets)...")
+    subprocess.run("pip install --no-deps 'unsloth[colab-new] @ git+https://github.com/unslothai/unsloth.git'", shell=True)
+    subprocess.run("pip install --no-deps unsloth_zoo xformers trl peft accelerate bitsandbytes datasets", shell=True)
+    from unsloth import FastLanguageModel
+    from datasets import load_dataset
+
+if not os.path.exists('/content/drive'):
+    drive.mount('/content/drive')
+
+# AYARLAR
+BASE_MODEL_NAME = "Qwen/Qwen2.5-Coder-1.5B-Instruct"
+CHECKPOINT_ROOT = "/content/drive/MyDrive/CodeGen_Project/models" # Senin Drive yolun
+OUTPUT_DIR = "/content/drive/MyDrive/CodeGen_Project/results"     # Sonuçlar buraya
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+# ==============================================================================
+# 2. YARDIMCI FONKSİYONLAR (Common klasörüne gerek kalmasın diye buraya aldık)
+# ==============================================================================
+
+def load_model_for_inference(checkpoint_path=None):
+    """Modeli (veya sadece Base modeli) yükler."""
+    model_name = checkpoint_path if checkpoint_path else BASE_MODEL_NAME
+    print(f"\n Model Yükleniyor: {model_name}")
+
+    model, tokenizer = FastLanguageModel.from_pretrained(
+        model_name=model_name,
+        max_seq_length=2048,
+        dtype=None,
+        load_in_4bit=True,
+    )
+    FastLanguageModel.for_inference(model)
+    return model, tokenizer
+
+def execute_code(code, test_cases):
+    """Python kodunu test eder (Basitleştirilmiş)."""
+    import tempfile
+
+    passed = 0
+    total = len(test_cases)
+
+    for case in test_cases:
+        inp = case.get("input", "")
+        exp = case.get("output", "").strip()
+
+        # Kodu dosyaya yaz
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
+            f.write(code)
+            fname = f.name
+
+        try:
+            # Çalıştır
+            proc = subprocess.Popen(
+                [sys.executable, fname],
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True
+            )
+            stdout, stderr = proc.communicate(input=inp, timeout=5)
+
+            if proc.returncode == 0 and stdout.strip() == exp:
+                passed += 1
+        except:
+            pass
+        finally:
+            if os.path.exists(fname): os.unlink(fname)
+
+    return passed, total
+
+# ==============================================================================
+# 3. MODÜL: KOD ARKEOLOĞU (SOHBET)
+# ==============================================================================
+def run_archeologist():
+    print("\n" + "="*60)
+    print(" KOD ARKEOLOĞU MODU AÇILDI")
+    print("="*60)
+
+    # Checkpoint Seçimi
+    print("Hangi model türü?")
+    print("[1] DEEP (Algoritma Uzmanı)")
+    print("[2] DIVERSE (Genel Python Uzmanı)")
+
+    secim = input(" Seçim (1/2): ")
+    folder_name = "deep_instruction" if secim == "1" else "diverse_instruction"
+    full_path = os.path.join(CHECKPOINT_ROOT, folder_name, "checkpoints")
+
+    # Checkpointleri listele
+    if not os.path.exists(full_path):
+        print(f" Klasör bulunamadı: {full_path}")
+        return
+
+    cps = sorted([d for d in os.listdir(full_path) if "checkpoint" in d], key=lambda x: int(x.split('-')[-1]))
+
+    print(f"\n {folder_name.upper()} ÇANTASI:")
+    for i, cp in enumerate(cps):
+        print(f"   [{i+1}] {cp}")
+
+    cp_idx = int(input(f" Hangi Seviye (1-{len(cps)}): ")) - 1
+    selected_cp = os.path.join(full_path, cps[cp_idx])
+
+    # Yükle ve Konuş
+    model, tokenizer = load_model_for_inference(selected_cp)
+
+    print("\n Arkeolog hazır! Kodunu yapıştır (Çıkış için 'q').")
+
+    while True:
+        user_code = input("\n📝 KOD:\n>> ")
+        if user_code.lower() in ['q', 'exit']: break
+
+        prompt = f"""Sen esprili bir Kod Arkeoloğusun. Aşağıdaki kodu incele, hataları 'DUR YOLCU!' diye yakala ve düzelt.
+
+KOD:
+{user_code}
+
+RAPOR:"""
+
+        inputs = tokenizer([prompt], return_tensors="pt").to("cuda")
+        outputs = model.generate(**inputs, max_new_tokens=512, use_cache=True)
+        print("\n RAPOR:", tokenizer.batch_decode(outputs[:, inputs.input_ids.shape[1]:], skip_special_tokens=True)[0])
+
+# ==============================================================================
+# 4. MODÜL: BENCHMARK (SINAV)
+# ==============================================================================
+def run_benchmark():
+    print("\n" + "="*60)
+    print(" BENCHMARK SINAVI BAŞLIYOR (LiveCodeBench)")
+    print("="*60)
+
+    # Model Türü Seçimi
+    print("Hangi modeli sınava sokacaksın?")
+    print("[1] DEEP")
+    print("[2] DIVERSE")
+    secim = input(" Seçim (1/2): ")
+    model_type = "deep_instruction" if secim == "1" else "diverse_instruction"
+
+    # Checkpoint Bulma
+    ckpt_dir = os.path.join(CHECKPOINT_ROOT, model_type, "checkpoints")
+    checkpoints = sorted([os.path.join(ckpt_dir, d) for d in os.listdir(ckpt_dir) if "checkpoint" in d], key=lambda x: int(x.split('-')[-1]))
+
+    # En son checkpoint'i otomatik seçelim (Vakit kazanmak için)
+    target_ckpt = checkpoints[-1]
+    print(f" Seçilen Aday: {os.path.basename(target_ckpt)}")
+
+    # Modeli Yükle
+    model, tokenizer = load_model_for_inference(target_ckpt)
+
+    # Soruları İndir (LiveCodeBench Lite)
+    print("\n Sınav kağıtları (Dataset) indiriliyor...")
+    try:
+        dataset = load_dataset("livecodebench/code_generation_lite", split="test")
+    except:
+        print("Lite versiyon bulunamadı, Full deneniyor...")
+        dataset = load_dataset("livecodebench/code_generation", split="test")
+
+    # Sadece Easy ve AtCoder filtrele (Hız için)
+    problems = [p for p in dataset if p['difficulty'] == 'easy' and p['platform'] == 'atcoder']
+    print(f" Toplam Soru Sayısı: {len(problems)}")
+
+    results = []
+    passed_count = 0
+
+    # Sınav Döngüsü
+    print("\n Sınav başladı...")
+    for prob in tqdm(problems):
+        prompt = f"You are an expert Python programmer. Solve this problem:\n{prob['question_content']}\n\nSolution:"
+
+        inputs = tokenizer([prompt], return_tensors="pt").to("cuda")
+        outputs = model.generate(**inputs, max_new_tokens=512, use_cache=True)
+        generated_code = tokenizer.batch_decode(outputs[:, inputs.input_ids.shape[1]:], skip_special_tokens=True)[0]
+
+        # Test Case Çıkarma ve Kontrol (Basit)
+        # Not: Gerçek test çok karmaşıktır, burada Pass@1 tahmini yapıyoruz.
+        # Tam puan için 'output' alanındaki test caseleri kullanmak lazım.
+        # Bu demo modunda sadece kod üretimini doğruluyoruz.
+
+        results.append({
+            "id": prob.get("question_id"),
+            "code": generated_code
+        })
+
+    # Sonuçları Kaydet
+    save_path = os.path.join(OUTPUT_DIR, f"{model_type}_benchmark_results.json")
+    with open(save_path, 'w') as f:
+        json.dump(results, f)
+
+    print(f"\n Sınav Bitti! Cevaplar şuraya kaydedildi: {save_path}")
+    print(" Not: Bu hızlı bir testtir. Tam Pass@1 oranı için eval.py scriptini Colab'e yükleyip çalıştırmak daha detaylı sonuç verir.")
+
+# ==============================================================================
+# ANA MENÜ
+# ==============================================================================
+while True:
+    print("\n" + "="*40)
+    print("ANA MENÜ")
+    print("1.  Kod Arkeoloğu (Sohbet)")
+    print("2.  Benchmark (Sınav)")
+    print("3.  Çıkış")
+
+    c = input(" Seçim: ")
+    if c == "1": run_archeologist()
+    elif c == "2": run_benchmark()
+    elif c == "3": break
