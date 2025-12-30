@@ -1,0 +1,90 @@
+import os
+import time
+from langchain_community.document_loaders import TextLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter, Language
+from langchain_ollama import OllamaEmbeddings
+from langchain_community.vectorstores import Chroma
+from langchain_ollama import ChatOllama
+from langchain.chains import RetrievalQA
+from langchain.prompts import PromptTemplate
+
+KLASOR_YOLU = r"C:\Users\bogid\OneDrive\Masaüstü\py\asd.py"
+EMBED_MODEL ="nomic-embed-text"
+CHAT_MODEL ="qwen2.5-coder:1.5b"
+
+def main():
+    print(f"📂 '{KLASOR_YOLU}' klasörü taranıyor...")
+    documents = []
+    dosya_sayısı = 0
+    for root, dirs, files in os.walk(KLASOR_YOLU):
+        for file in files:
+            if file.endswith((".py", ".js", ".c", ".cpp", ".java", ".html", ".css")):
+                try:
+                    path=os.path.join(root,file)
+                    loader = TextLoader(path,encoding='uft-8', autodetect_enoding=True)
+                    documents.extend(loader.load())
+                    dosya_sayısı += 1
+                except Exception as e:
+                    print(f"⚠️ Hata ({file}): {e}")
+    print(f"✅ Toplam {dosya_sayisi} dosya yüklendi.")
+    if not documents:
+        print("❌ Hiç kod dosyası bulunamadı! Klasör yolunu kontrol et.")
+        return
+    text_splitter = RecursiveCharacterTextSplitter.from_language(
+        language=Language.PYTHON,
+        chunk_size=1000,
+        chunk_overlap=100
+    )
+    texts=text_splitter.split_documents(documents)
+    print(f"✂️ Kodlar {len(texts)} parçaya bölündü.")
+    print("🧠 Kod hafızası oluşturuluyor (Embedding)...")
+    embeddings=OllamaEmbeddings(model=EMBED_MODEL)
+    db=Chroma.from_documents(texts,embeddings)
+    llm=ChatOllama(
+        model=CHAT_MODEL,
+        temperature=0.2,
+    )
+    prompt_template = """
+    Sen uzman bir Kod Arkeoloğusun. Sana verilen kod parçalarını (Context) kullanarak soruyu cevapla.
+    
+    Kurallar:
+    1. Sadece verilen bağlamdaki (Context) bilgilere dayan.
+    2. Kodun ne yaptığını teknik olarak açıkla.
+    3. Eğer bağlamda cevap yoksa "Bu bilgi kodlarda bulunamadı" de.
+    
+    Context (Kod Parçaları):
+    {context}
+    
+    Soru: {question}
+    
+    Cevap:
+    """
+    PROMPT=PromptTemplate(
+        template=prompt_template,input_variables=["context","question"],
+    )
+    qa_chain=RetrievalQA.from_chain_type(
+        llm=llm,
+        chain_type="stuff",
+        retriever=db.as_retriever(search_kwargs={"k":5}),
+        chain_type_kwargs={"prompt":PROMPT}
+    )
+    print("\n--- 🏛️ KOD ARKEOLOĞU HAZIR (Çıkış için 'q') ---")
+    while True:
+        soru=input("\nSoru Sor: ")
+        if soru.lower()=="q":
+            break
+        start = time.time()
+        cevap=qa_chain.solve(soru)
+        end = time.time()
+        print(f"\n[Arkeolog ({end-start:.2f}sn)]:\n{cevap}")
+if __name__ == "__main__":
+    main()
+
+
+
+
+
+
+
+
+
