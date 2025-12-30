@@ -1,0 +1,95 @@
+import os
+import json
+import matplotlib.pyplot as plt
+from google.colab import drive
+
+# 1. Drive Bağla
+if not os.path.exists('/content/drive'):
+    drive.mount('/content/drive')
+
+# DIVERSE MODELİNİN YOLU (Burası farklı)
+BASE_DIR = "/content/drive/MyDrive/CodeGen_Project/models/diverse_instruction/checkpoints"
+
+print(f" Diverse Klasörü Taranıyor: {BASE_DIR}")
+
+# 2. En son checkpoint'i bul
+try:
+    if not os.path.exists(BASE_DIR):
+        raise FileNotFoundError("Klasör yok")
+
+    checkpoints = [d for d in os.listdir(BASE_DIR) if "checkpoint" in d]
+    if not checkpoints:
+        raise FileNotFoundError("Checkpoint yok")
+
+    # Numaraya göre sırala
+    checkpoints.sort(key=lambda x: int(x.split('-')[-1]))
+
+    latest_checkpoint = checkpoints[-1]
+    json_path = os.path.join(BASE_DIR, latest_checkpoint, "trainer_state.json")
+
+    print(f" Bulunan En Son Kayıt: {latest_checkpoint}")
+    print(f" Okunan Dosya: {json_path}")
+
+except Exception as e:
+    print(f" HATA: Diverse checkpointleri bulunamadı. Eğitim bitmemiş veya klasör yolu yanlış olabilir.")
+    print(f"Aranan Yol: {BASE_DIR}")
+    raise SystemExit("Veri yok.")
+
+# 3. JSON Dosyasını Oku
+with open(json_path, 'r') as f:
+    data = json.load(f)
+
+log_history = data['log_history']
+
+train_steps = []
+train_losses = []
+eval_steps = []
+eval_losses = []
+
+print("\n" + "="*50)
+print(f" KURTARILAN EĞİTİM TABLOSU (DIVERSE)")
+print("="*50)
+print(f"{'Adım':<10} | {'Train Loss':<15} | {'Validation Loss':<20}")
+print("-" * 50)
+
+# Verileri ayrıştır
+for entry in log_history:
+    if 'loss' in entry: # Train
+        step = entry['step']
+        loss = entry['loss']
+        train_steps.append(step)
+        train_losses.append(loss)
+        print(f"{step:<10} | {loss:<15.4f} | {'-':<20}")
+
+    elif 'eval_loss' in entry: # Validation
+        step = entry['step']
+        loss = entry['eval_loss']
+        eval_steps.append(step)
+        eval_losses.append(loss)
+        print(f"{step:<10} | {'-':<15} | {loss:<20.4f}")
+
+# 4. GRAFİK ÇİZ (RAPOR İÇİN)
+print("\n Diverse Grafiği Çiziliyor...")
+
+plt.figure(figsize=(10, 6))
+
+# Train Loss (Mavi)
+plt.plot(train_steps, train_losses, label='Training Loss', color='blue', alpha=0.6)
+
+# Validation Loss (Kırmızı - Daha önemli)
+if eval_steps:
+    plt.plot(eval_steps, eval_losses, label='Validation Loss', color='red', linewidth=2, marker='x')
+
+plt.title('DIVERSE Model - Loss Grafiği')
+plt.xlabel('Adım (Steps)')
+plt.ylabel('Loss Değeri')
+plt.legend()
+plt.grid(True, linestyle='--', alpha=0.5)
+
+# Kaydet
+graph_path = "/content/diverse_loss_graph.png"
+plt.savefig(graph_path)
+print(f"✅ Grafik kaydedildi: {graph_path}")
+print("(Soldaki dosyalar menüsünden çift tıklayıp indir!)")
+
+plt.show()
